@@ -65,6 +65,4 @@ Remove-Variable TraceVerboseTimer
 ## Relax the code signing restriction so we can actually get work done
 try { Set-ExecutionPolicy RemoteSigned Process } catch [PlatformNotSupportedException] {}
 
-if("Core" -eq $PSVersionTable.PSEdition) {
-    $VerbosePreference = "SilentlyContinue"
-}
+$VerbosePreference = "SilentlyContinue"
