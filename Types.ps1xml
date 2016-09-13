@@ -1,0 +1,73 @@
+<!-- *******************************************************************
+This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
+******************************************************************** -->
+<Types>
+    <Type>
+        <Name>System.Byte[]</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>Hex</Name>
+                <GetScriptBlock>
+                    $this | % {write-host $([String]::Format("{0:X}",$_)) -nonew}
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+    <Type>
+        <Name>Microsoft.PowerShell.Commands.MemberDefinition</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>HelpLink</Name>
+                <GetScriptBlock>"http://msdn2.microsoft.com/library/$($this.typename)$($this.name).aspx"</GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+   </Type>
+    <Type>
+        <Name>System.String</Name>
+        <Members>
+            <ScriptMethod>
+                <Name>ToBase64</Name>
+                <Script>
+                    [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($this))
+                </Script>
+            </ScriptMethod>
+            <ScriptMethod>
+                <Name>FromBase64</Name>
+                <Script>
+                    [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($this))
+                </Script>
+            </ScriptMethod>
+        </Members>
+    </Type>
+    <Type>
+        <Name>System.Security.SecureString</Name>
+        <Members>
+            <ScriptMethod>
+                <Name>ToPlainText</Name>
+                <Script>
+                    $plaintext = ""
+                    try {
+                        $BSTR = [System.Runtime.InteropServices.marshal]::SecureStringToBSTR($this);
+                        $plaintext = [System.Runtime.InteropServices.marshal]::PtrToStringAuto($BSTR);
+                    } finally {
+                        if($BSTR -ne [IntPtr]::Zero) {
+                            [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR);
+                        }
+                    }
+                    Write-Output $plaintext
+                </Script>
+            </ScriptMethod>
+        </Members>
+    </Type>
+    <Type>
+        <Name>Microsoft.PowerShell.Commands.HistoryInfo</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>Duration</Name>
+                <GetScriptBlock>
+                    $this.EndExecutionTime - $this.StartExecutionTime
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+</Types>

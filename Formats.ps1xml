@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- *******************************************************************
+This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
+******************************************************************** -->
+<Configuration>
+    
+    <SelectionSets>
+        <SelectionSet>
+            <Name>FileSystemTypes</Name>
+            <Types>
+                <TypeName>System.IO.DirectoryInfo</TypeName>
+                <TypeName>System.IO.FileInfo</TypeName>
+            </Types>
+        </SelectionSet>
+    </SelectionSets>
+
+    <!-- ################ CONTROL DEFINITIONS ################ -->
+    <Controls>
+        <Control>
+            <Name>FileSystemTypes-GroupingFormat</Name>
+                    <CustomControl>
+                        <CustomEntries>
+                            <CustomEntry>
+                                <CustomItem>
+                                    <Frame>
+                                        <LeftIndent>4</LeftIndent>
+                                        <CustomItem>
+                                            <Text>Directory </Text>
+                                            <ExpressionBinding>
+                                              <ScriptBlock>
+                                                  $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::","")
+                                              </ScriptBlock>
+                                            </ExpressionBinding>
+                                            <NewLine/>
+                                        </CustomItem> 
+                                    </Frame>
+                                </CustomItem>
+                            </CustomEntry>
+                        </CustomEntries>
+            </CustomControl>
+        </Control>
+    </Controls>
+
+    <ViewDefinitions>
+        <View>
+            <Name>history</Name>
+            <ViewSelectedBy>
+                <TypeName>Microsoft.PowerShell.Commands.HistoryInfo</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Width>4</Width>
+                        <Alignment>Right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Duration</Label>
+                        <Width>11</Width>
+                        <Alignment>Right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>CommandLine</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Id</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    $ts = $_.EndExecutionTime - $_.StartExecutionTime
+                                    if($ts.Minutes) {
+                                        if($ts.Hours) {
+                                            if($ts.Days) {
+                                               return "{0:##}d {1:00}h {2:00}m" -f $ts.Days, $ts.Hours, $ts.Minutes
+                                            }
+                                            return "{0:##}h {1:00}m {2:00}s" -f $ts.Hours, $ts.Minutes, $ts.Seconds
+                                        }
+                                        return "{0:##}m {1:n3}s" -f $ts.Minutes, ($ts.TotalSeconds - ($ts.Minutes * 60))
+                                    }
+                                    return "{0:n7}s" -f $ts.TotalSeconds
+                                </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    $_.CommandLine.TrimStart() -replace "[\r\n]+", "$([char]0x2026) "
+                                </ScriptBlock>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+       <View>
+            <Name>colors</Name>
+            <ViewSelectedBy>
+                <SelectionSetName>FileSystemTypes</SelectionSetName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>PSParentPath</PropertyName> 
+                <CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>  
+            </GroupBy>
+            <TableControl>
+                <TableHeaders>
+                   <TableColumnHeader>
+                      <Label>Mode</Label>
+                      <Width>7</Width>
+                      <Alignment>left</Alignment>
+                   </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>LastWriteTime</Label>
+                        <Width>25</Width>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Length</Label>
+                        <Width>14</Width>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                      <Label>Name</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <Wrap/>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Mode</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    [String]::Format("{0,10}  {1,8}", $_.LastWriteTime.ToString("d"), $_.LastWriteTime.ToString("t"))
+                                </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Length</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    # ANSI Colors are 30-37 and 90-97
+                                    if ($host.UI.SupportsVirtualTerminal)
+                                    {
+                                        $f = $_
+                                        $e = [char]27 + "["
+                                        switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
+                                        {
+                                            '^(exe)$' # Applications
+                                            {
+                                                "${e}31m$($f.Name)${e}0m"
+                                            }
+                                            '^(ps1|cmd|bat|sh|py|rb|js|pl)$' # Scripts
+                                            {
+                                                "${e}91m$($f.Name)${e}0m"
+                                            }
+                                            '^(psm1|dll)$' # Modules, Assemblies
+                                            {
+                                                "${e}93m$($f.Name)${e}0m"
+                                            }
+                                            '^(csv|xml|ps1xml|clixml|psd1|json)$' # Importable data files
+                                            {
+                                                "${e}96m$($f.Name)${e}0m"
+                                            }
+                                            '^(txt|log)$' # readable Text Files
+                                            {
+                                                "${e}94m$($f.Name)${e}0m"
+                                            }
+                                            '^(conf|config|reg)$' # Config files
+                                            {
+                                                "${e}33m$($f.Name)${e}0m"
+                                            }
+                                            '^(docx?|xlsx?|pdf|html?|chm)$' # Documents
+                                            {
+                                               "${e}36m$($f.Name)${e}0m"
+                                            }
+                                            default
+                                            {
+                                                $f.Name
+                                            }
+                                        }
+                                        return
+                                    }
+                                    $_.Name
+                                </ScriptBlock>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
+            <Name>colors</Name>
+            <ViewSelectedBy>
+                <SelectionSetName>FileSystemTypes</SelectionSetName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>PSParentPath</PropertyName> 
+                <CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>  
+            </GroupBy>
+            <WideControl>
+                <WideEntries>
+                    <WideEntry>
+                        <WideItem>
+                            <PropertyName>Name</PropertyName>
+                        </WideItem>
+                    </WideEntry>
+                    <WideEntry>
+                        <EntrySelectedBy>
+                            <TypeName>System.IO.FileInfo</TypeName>
+                        </EntrySelectedBy>
+                        <WideItem>
+                            <ScriptBlock>
+                                # ANSI Colors are 30-37 and 90-97
+                                if ($host.UI.SupportsVirtualTerminal)
+                                {
+                                    $f = $_
+                                    $e = [char]27 + "["
+                                    switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
+                                    {
+                                        '^(exe)$' # Applications
+                                        {
+                                            "${e}31m$($f.Name)${e}0m"
+                                        }
+                                        '^(ps1|cmd|bat|sh|py|rb|js|pl)$' # Scripts
+                                        {
+                                            "${e}91m$($f.Name)${e}0m"
+                                        }
+                                        '^(psm1|dll)$' # Modules, Assemblies
+                                        {
+                                            "${e}93m$($f.Name)${e}0m"
+                                        }
+                                        '^(csv|xml|ps1xml|clixml|psd1|json)$' # Importable data files
+                                        {
+                                            "${e}96m$($f.Name)${e}0m"
+                                        }
+                                        '^(txt|log)$' # readable Text Files
+                                        {
+                                            "${e}94m$($f.Name)${e}0m"
+                                        }
+                                        '^(conf|config|reg)$' # Config files
+                                        {
+                                            "${e}33m$($f.Name)${e}0m"
+                                        }
+                                        '^(docx?|xlsx?|pdf|html?|chm)$' # Documents
+                                        {
+                                           "${e}36m$($f.Name)${e}0m"
+                                        }
+                                        default
+                                        {
+                                            $f.Name
+                                        }
+                                    }
+                                    return
+                                }
+                                $_.Name
+                            </ScriptBlock>
+                        </WideItem>
+                    </WideEntry>
+                </WideEntries>
+            </WideControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
