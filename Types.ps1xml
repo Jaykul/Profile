@@ -1,6 +1,6 @@
-<!-- *******************************************************************
+<!--******************************************************************
 This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
-******************************************************************** -->
+******************************************************************-->
 <Types>
     <Type>
         <Name>System.Byte[]</Name>
@@ -18,8 +18,14 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
         <Members>
             <ScriptProperty>
                 <Name>HelpLink</Name>
-                <GetScriptBlock>"http://msdn2.microsoft.com/library/$($this.typename)$($this.name).aspx"</GetScriptBlock>
+                <GetScriptBlock>"http://msdn2.microsoft.com/library/$($this.typename).$($this.name).aspx"</GetScriptBlock>
             </ScriptProperty>
+            <ScriptMethod>
+                <Name>OpenHelpLink</Name>
+                <Script>
+                    Start-Process $this.HelpLink
+                </Script>
+            </ScriptMethod>
         </Members>
    </Type>
     <Type>

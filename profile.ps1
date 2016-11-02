@@ -8,6 +8,7 @@ Set-Variable ProfileDir (Split-Path $MyInvocation.MyCommand.Path -Parent) -Scope
 
 # Ensure that PSHome\Modules is there so we can load the default modules
 $Env:PSModulePath += ";$PSHome\Modules"
+
 # These will get loaded automatically, but it's faster to load them explicitly all at once
 Import-Module Microsoft.PowerShell.Management,
               Microsoft.PowerShell.Security,
@@ -37,12 +38,6 @@ if("Core" -eq $PSVersionTable.PSEdition) {
 # This has to happen after the verbose check, obviously
 Trace-Message "Modules Imported" -Stopwatch $TraceVerboseTimer
 
-Set-Variable LiveID (
-        [System.Security.Principal.WindowsIdentity]::GetCurrent().Groups |
-        Where Value -match "^S-1-11-96" |
-        ForEach Translate([System.Security.Principal.NTAccount]) |
-        ForEach Value) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
-
 # I prefer that my sessions start in my profile directory
 if($ProfileDir -ne (Get-Location)) { Set-Location $ProfileDir }
 
@@ -50,11 +45,16 @@ if($ProfileDir -ne (Get-Location)) { Set-Location $ProfileDir }
 $Env:PSModulePath = Select-UniquePath "$ProfileDir\Modules" (Get-SpecialFolder *Modules -Value) ${Env:PSModulePath} "${Home}\Projects\Modules"
 Trace-Message "Env:PSModulePath Updated"
 
-## And a couple of functions that can't be saved as script files for whatever reason
-function Reset-Module ($ModuleName) { rmo $ModuleName; ipmo $ModuleName -force -pass | ft Name, Version, Path -Auto }
-
-## The qq shortcut for quick quotes
-function qq {param([Parameter(ValueFromRemainingArguments=$true)][string[]]$q)$q}
+## This function cannot be in a module (else it will import the module to a nested scope)
+function Reset-Module {
+    <#
+    .Synopsis
+        Remove and re-import a module to force a full reload
+    #>
+    param($ModuleName)
+    Microsoft.PowerShell.Core\Remove-Module $ModuleName
+    Microsoft.PowerShell.Core\Import-Module $ModuleName -force -pass | Format-Table Name, Version, Path -Auto
+}
 
 # I have a hard time remembering to use ZLocation. This helped...
 Set-Alias cd Set-ZLocation -Option AllScope

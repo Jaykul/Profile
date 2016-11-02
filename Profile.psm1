@@ -1,5 +1,10 @@
-﻿## I need some additional PSReadLine configuration as well
-if($Host.Name -eq "ConsoleHost" -and !$NOCONSOLE) {
+﻿## There were some problems with hosts using PSReadLine who shouldn't
+if($Host.Name -ne "ConsoleHost") {
+    Remove-Module PSReadLine -ErrorAction SilentlyContinue
+    Trace-Message "PSReadLine skipped!"
+}
+# Only configure PSReadLine if it's already running
+elseif(Get-Module PSReadline) {
     Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
     Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
     Set-PSReadlineKeyHandler Ctrl+R ReverseSearchHistory
@@ -13,9 +18,6 @@ if($Host.Name -eq "ConsoleHost" -and !$NOCONSOLE) {
     Set-PSReadlineKeyHandler Ctrl+K KillLine
     Set-PSReadlineKeyHandler Ctrl+I Yank
     Trace-Message "PSReadLine fixed"
-} else {
-    Remove-Module PSReadLine -ErrorAction SilentlyContinue
-    Trace-Message "PSReadLine skipped!"
 }
 
 function Set-HostColor {
@@ -103,7 +105,7 @@ function Set-HostColor {
         ),  @(
                 @{ bg = "Blue";     fg = "White"; text = { $MyInvocation.HistoryId } }
                 @{ bg = "Cyan";     fg = "White"; text = { [PowerLine.Prompt]::Gear * $NestedPromptLevel } }
-                @{ bg = "Cyan";     fg = "White"; text = { if($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } } }
+                @{ bg = "Cyan";     fg = "White"; text = { if($pushd = (Get-Location -Stack).count) { "" + ([char]187) + $pushd } } }
                 @{ bg = "DarkBlue"; fg = "White"; text = { $pwd.Drive.Name } }
                 @{ bg = "DarkBlue"; fg = "White"; text = { Split-Path $pwd -leaf } }
             )
@@ -155,17 +157,23 @@ function Update-ToolPath {
     Trace-Message "Env:PATH Updated"
 }
 
+if(!$ProfileDir -or !(Test-Path $ProfileDir)) {
+    $ProfileDir = Split-Path $Profile.CurrentUserAllHosts
+}
+
 $QuoteDir = Join-Path (Split-Path $ProfileDir -parent) "Quotes"
 if(!(Test-Path $QuoteDir)) {
     $QuoteDir = Join-Path $PSScriptRoot Quotes
 }
 
 # Only export $QuoteDir if it refers to a folder that actually exists
-Set-Variable QuoteDir (Resolve-Path $QuoteDir) -Scope Global -Option AllScope -Description "Personal Quotes Path Source"
+Set-Variable QuoteDir (Resolve-Path $QuoteDir) -Description "Personal Quotes Path Source"
 
+Set-Alias gq Get-Quote
 function Get-Quote {
     param(
-        $Path = "${QuoteDir}\attributed quotes.txt",
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string]$Path = "${QuoteDir}\attributed quotes.txt",
         [int]$Count=1
     )
     if(!(Test-Path $Path) ) {
@@ -174,10 +182,28 @@ function Get-Quote {
             $Path = $Path + ".txt"
         }
     }
-    Get-Content $Path | Where-Object { $_ } | Get-Random -Count $Count
+    Get-Content $Path | Where { $_ } | Get-Random -Count $Count
 }
 
-Set-Alias gq Get-Quote
+## The qq shortcut for quick quotes
+Set-Alias qq ConvertTo-StringArray
+function ConvertTo-StringArray {
+    <#
+        .Synopsis
+            Cast parameter array to string (see examples)
+        .Example
+            $array = qq there is no need to use quotes or commas to create a string array
+
+            Is the same as writing this, but with a lot less typing::
+            $array = "there", "is", "no", "need", "to", "use", "quotes", "or", "commas", "to", "create", "a", "string", "array"
+    #>
+    param(
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string[]]$InputObject
+    )
+    $InputObject
+}
+
 Trace-Message "Random Quotes Loaded"
 
 # Run these functions once
@@ -189,4 +215,14 @@ if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
     Get-Quote | Write-Host -Foreground Yellow
 }
 
-Export-ModuleMember -Function * -Alias *
+# If you log in with a Windows Identity, this will capture it
+Set-Variable LiveID (
+        [System.Security.Principal.WindowsIdentity]::GetCurrent().Groups |
+        Where Value -match "^S-1-11-96" |
+        ForEach Translate([System.Security.Principal.NTAccount]) |
+        ForEach Value) -Option Constant -ErrorAction SilentlyContinue
+
+# Unfortunately, in order for our File Format colors and History timing to take prescedence, we need to PREPEND the path:
+Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'Formats.ps1xml')
+
+Export-ModuleMember -Function * -Alias * -Variable LiveID, QuoteDir
