@@ -16,25 +16,25 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
     <Controls>
         <Control>
             <Name>FileSystemTypes-GroupingFormat</Name>
-                    <CustomControl>
-                        <CustomEntries>
-                            <CustomEntry>
+            <CustomControl>
+                <CustomEntries>
+                    <CustomEntry>
+                        <CustomItem>
+                            <Frame>
+                                <LeftIndent>4</LeftIndent>
                                 <CustomItem>
-                                    <Frame>
-                                        <LeftIndent>4</LeftIndent>
-                                        <CustomItem>
-                                            <Text>Directory </Text>
-                                            <ExpressionBinding>
-                                              <ScriptBlock>
-                                                  $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::","")
-                                              </ScriptBlock>
-                                            </ExpressionBinding>
-                                            <NewLine/>
-                                        </CustomItem>
-                                    </Frame>
+                                    <Text>Directory </Text>
+                                    <ExpressionBinding>
+                                        <ScriptBlock>
+                                            $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::","")
+                                        </ScriptBlock>
+                                    </ExpressionBinding>
+                                    <NewLine/>
                                 </CustomItem>
-                            </CustomEntry>
-                        </CustomEntries>
+                            </Frame>
+                        </CustomItem>
+                    </CustomEntry>
+                </CustomEntries>
             </CustomControl>
         </Control>
     </Controls>
@@ -74,7 +74,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                                         {
                                             if($ts.Days)
                                             {
-                                               return "{0:##}d {1:00}h {2:00}m" -f $ts.Days, $ts.Hours, $ts.Minutes
+                                                return "{0:##}d {1:00}h {2:00}m" -f $ts.Days, $ts.Hours, $ts.Minutes
                                             }
                                             return "{0:##}h {1:00}m {2:00}s" -f $ts.Hours, $ts.Minutes, $ts.Seconds
                                         }
@@ -93,7 +93,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                 </TableRowEntries>
             </TableControl>
         </View>
-       <View>
+        <View>
             <Name>colors</Name>
             <ViewSelectedBy>
                 <SelectionSetName>FileSystemTypes</SelectionSetName>
@@ -104,11 +104,11 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
             </GroupBy>
             <TableControl>
                 <TableHeaders>
-                   <TableColumnHeader>
-                      <Label>Mode</Label>
-                      <Width>7</Width>
-                      <Alignment>left</Alignment>
-                   </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Mode</Label>
+                        <Width>7</Width>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
                     <TableColumnHeader>
                         <Label>LastWriteTime</Label>
                         <Width>25</Width>
@@ -120,7 +120,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                         <Alignment>right</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                      <Label>Name</Label>
+                        <Label>Name</Label>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
@@ -173,7 +173,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                                             }
                                             '^(docx?|xlsx?|pdf|html?|chm)$' # Documents
                                             {
-                                               "${e}36m$($f.Name)${e}0m"
+                                            "${e}36m$($f.Name)${e}0m"
                                             }
                                             default
                                             {
@@ -260,6 +260,46 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                     </WideEntry>
                 </WideEntries>
             </WideControl>
+        </View>
+        <View>
+            <Name>System.RuntimeType</Name>
+            <ViewSelectedBy>
+                <TypeName>System.RuntimeType</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>IsPublic</Label>
+                        <Width>8</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>IsSerial</Label>
+                        <Width>8</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Width>40</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader />
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>IsPublic</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>IsSerializable</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Name</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>FullName</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
         </View>
     </ViewDefinitions>
 </Configuration>
