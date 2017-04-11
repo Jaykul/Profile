@@ -147,7 +147,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                                         $e = [char]27 + "["
                                         switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
                                         {
-                                            '^(exe)$' # Applications
+                                            '^(exe|com)$' # Applications
                                             {
                                                 "${e}31m$($f.Name)${e}0m"
                                             }
@@ -167,13 +167,13 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                                             {
                                                 "${e}94m$($f.Name)${e}0m"
                                             }
-                                            '^(conf|config|reg)$' # Config files
+                                            '^(conf|config|reg|ini|sys|yaml)$' # Config files
                                             {
                                                 "${e}33m$($f.Name)${e}0m"
                                             }
-                                            '^(docx?|xlsx?|pdf|html?|chm)$' # Documents
+                                            '^(docx?|xlsx?|pptx?|odt|rtf|pdf|html?|chm)$' # Documents
                                             {
-                                            "${e}36m$($f.Name)${e}0m"
+                                                "${e}36m$($f.Name)${e}0m"
                                             }
                                             default
                                             {
