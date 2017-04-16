@@ -56,7 +56,8 @@ RequiredModules = @(@{ModuleName="Environment"; ModuleVersion="0.0"},
                     @{ModuleName="Pansies"; ModuleVersion="0.1.0"},
                     @{ModuleName="PSGit"; ModuleVersion="2.0.5"},
                     @{ModuleName="DefaultParameter"; ModuleVersion="1.6"},
-                    @{ModuleName="PowerLine"; ModuleVersion="2.2.2"})
+                    @{ModuleName="PowerLine"; ModuleVersion="2.2.2"},
+                    @{ModuleName="xColors"; ModuleVersion="1.1.0"})
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()

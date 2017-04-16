@@ -15,10 +15,12 @@ Import-Module Microsoft.PowerShell.Management,
               Microsoft.PowerShell.Utility,
               Environment,
               Configuration,
+              Pansies,
               PSGit,
               PowerLine,
               Profile,
-              DefaultParameter -Verbose:$false
+              DefaultParameter,
+              xColors -Verbose:$false
 
 # For now, CORE edition is always verbose, because I can't test for KeyState
 if("Core" -eq $PSVersionTable.PSEdition) {
