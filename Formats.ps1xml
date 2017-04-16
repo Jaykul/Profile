@@ -141,45 +141,45 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                             <TableColumnItem>
                                 <ScriptBlock>
                                     # ANSI Colors are 30-37 and 90-97
-                                    if ($host.UI.SupportsVirtualTerminal)
+                                    if ($host.UI.SupportsVirtualTerminal -and (Get-Command New-Text))
                                     {
-                                        $f = $_
-                                        $e = [char]27 + "["
-                                        switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
+                                        $Text = New-Text $_.Name -Clear -Foreground White
+                                        $Text.ForegroundColor = switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
                                         {
                                             '^(exe|com)$' # Applications
                                             {
-                                                "${e}31m$($f.Name)${e}0m"
+                                                "DarkRed"
                                             }
                                             '^(ps1|cmd|bat|sh|py|rb|js|pl)$' # Scripts
                                             {
-                                                "${e}91m$($f.Name)${e}0m"
+                                                "Red"
                                             }
                                             '^(psm1|dll)$' # Modules, Assemblies
                                             {
-                                                "${e}93m$($f.Name)${e}0m"
+                                                "Yellow"
                                             }
                                             '^(csv|xml|ps1xml|clixml|psd1|json)$' # Importable data files
                                             {
-                                                "${e}96m$($f.Name)${e}0m"
+                                                "DarkCyan"
                                             }
-                                            '^(txt|log)$' # readable Text Files
+                                            '^(txt|log|md)$' # readable Text Files
                                             {
-                                                "${e}94m$($f.Name)${e}0m"
+                                                "Blue"
                                             }
-                                            '^(conf|config|reg|ini|sys|yaml)$' # Config files
+                                            '^(conf|config|reg|ini|sys|yaml|gitignore)$' # Config files
                                             {
-                                                "${e}33m$($f.Name)${e}0m"
+                                                "DarkYellow"
                                             }
                                             '^(docx?|xlsx?|pptx?|odt|rtf|pdf|html?|chm)$' # Documents
                                             {
-                                                "${e}36m$($f.Name)${e}0m"
+                                                "Cyan"
                                             }
                                             default
                                             {
-                                                $f.Name
+                                                "Gray"
                                             }
                                         }
+                                        $Text
                                         return
                                     }
                                     $_.Name

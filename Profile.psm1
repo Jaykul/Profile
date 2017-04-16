@@ -1,10 +1,5 @@
-﻿## There were some problems with hosts using PSReadLine who shouldn't
-if($Host.Name -ne "ConsoleHost") {
-    Remove-Module PSReadLine -ErrorAction SilentlyContinue
-    Trace-Message "PSReadLine skipped!"
-}
-# Only configure PSReadLine if it's already running
-elseif(Get-Module PSReadline) {
+﻿# Only configure PSReadLine if it's already running
+if(Get-Module PSReadline) {
     Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
     Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
     Set-PSReadlineKeyHandler Ctrl+R ReverseSearchHistory
@@ -18,6 +13,12 @@ elseif(Get-Module PSReadline) {
     Set-PSReadlineKeyHandler Ctrl+K KillLine
     Set-PSReadlineKeyHandler Ctrl+I Yank
     Trace-Message "PSReadLine fixed"
+
+    ## There were some problems with hosts using PSReadLine who shouldn't
+    if($Host.Name -ne "ConsoleHost") {
+        Remove-Module PSReadLine -ErrorAction SilentlyContinue
+        Trace-Message "PSReadLine skipped!"
+    }
 }
 
 function Set-HostColor {
@@ -53,20 +54,9 @@ function Set-HostColor {
     $Host.UI.RawUI.BackgroundColor = $BackgroundColor
     $Host.UI.RawUI.ForegroundColor = $ForegroundColor
 
-    $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
-    $Host.PrivateData.ErrorBackgroundColor    = $BackgroundColor
-    $Host.PrivateData.WarningForegroundColor  = "${Dark}Yellow"
-    $Host.PrivateData.WarningBackgroundColor  = $BackgroundColor
-    $Host.PrivateData.DebugForegroundColor    = "Green"
-    $Host.PrivateData.DebugBackgroundColor    = $BackgroundColor
-    $Host.PrivateData.VerboseForegroundColor  = "${Dark}Cyan"
-    $Host.PrivateData.VerboseBackgroundColor  = $BackgroundColor
-    $Host.PrivateData.ProgressForegroundColor = "DarkMagenta"
-    $Host.PrivateData.ProgressBackgroundColor = "Gray"
-
     if($Host.Name -ne "ConsoleHost") {
-       Write-Warning "This script assumes ConsoleHost and PSReadLine."
-       if($Host.Name -eq "Windows PowerShell ISE Host") {
+        Write-Warning "Much of my profile assumes ConsoleHost + PSReadLine."
+        if($Host.Name -eq "Windows PowerShell ISE Host") {
             $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
             $Host.PrivateData.WarningForegroundColor  = "Gold"
             $Host.PrivateData.DebugForegroundColor    = "Green"
@@ -75,8 +65,18 @@ function Set-HostColor {
                 $Host.UI.RawUI.BackgroundColor = "DarkGray"
             }
         }
-
-       if(!$Force) { return }
+        if(!$Force) { return }
+    } else {
+        $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
+        $Host.PrivateData.ErrorBackgroundColor    = $BackgroundColor
+        $Host.PrivateData.WarningForegroundColor  = "${Dark}Yellow"
+        $Host.PrivateData.WarningBackgroundColor  = $BackgroundColor
+        $Host.PrivateData.DebugForegroundColor    = "Green"
+        $Host.PrivateData.DebugBackgroundColor    = $BackgroundColor
+        $Host.PrivateData.VerboseForegroundColor  = "${Dark}Cyan"
+        $Host.PrivateData.VerboseBackgroundColor  = $BackgroundColor
+        $Host.PrivateData.ProgressForegroundColor = "DarkMagenta"
+        $Host.PrivateData.ProgressBackgroundColor = "Gray"
     }
 
     Set-PSReadlineOption -ContinuationPromptForegroundColor DarkGray -ContinuationPromptBackgroundColor $BackgroundColor -ContinuationPrompt "``  "
@@ -95,26 +95,23 @@ function Set-HostColor {
     Set-PSReadlineOption -TokenKind None      -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
     Set-PSReadlineOption -TokenKind Comment   -ForegroundColor "DarkGray" -BackgroundColor $BackgroundColor
 
-    [PowerLine.Prompt]$global:PowerLinePrompt = 1,
-        (
-            $null, # No left-aligned content on this line
-            @(
-                @{ text = { New-PowerLineBlock (Get-Elapsed) -ErrorBackgroundColor DarkRed -ErrorForegroundColor White -ForegroundColor Black -BackgroundColor DarkGray } }
-                @{ bg = "Gray";     fg = "Black"; text = { Get-Date -f "T" } }
-            )
-        ),  @(
+    [PowerLine.Prompt]$global:PowerLinePrompt =  @(@(
                 @{ bg = "Blue";     fg = "White"; text = { $MyInvocation.HistoryId } }
                 @{ bg = "Cyan";     fg = "White"; text = { [PowerLine.Prompt]::Gear * $NestedPromptLevel } }
                 @{ bg = "Cyan";     fg = "White"; text = { if($pushd = (Get-Location -Stack).count) { "" + ([char]187) + $pushd } } }
-                @{ bg = "DarkBlue"; fg = "White"; text = { $pwd.Drive.Name } }
-                @{ bg = "DarkBlue"; fg = "White"; text = { Split-Path $pwd -leaf } }
+                @{ bg = "DarkBlue"; fg = "White"; text = { Get-SegmentedPath } }
+            ), @(
+                @{ text = { New-TextFactory (Get-Elapsed) -ErrorBackgroundColor DarkRed -ErrorForegroundColor White -ForegroundColor Black -BackgroundColor DarkGray } }
+                @{ bg = "Gray";     fg = "Black"; text = { Get-Date -f "T" } }
+            )), @(
+                #-ErrorBackgroundColor DarkRed -ErrorForegroundColor White
+                @{ bg = "White";    fg = "Black"; text = { "I " + ([PoshCode.Pansies.Text]@{ fg = "red";  text = "&hearts;" }) + ([PoshCode.Pansies.Text]@{ fg = "Black";  text = " PS" })  } }
             )
 
-    Set-PowerLinePrompt -CurrentDirectory -PowerlineFont:(!$SafeCharacters) -Title { "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name }
-
+    Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -PowerlineFont:(!$SafeCharacters) -Title { "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name }
 
     if(Get-Module PSGit) {
-        $PowerLinePrompt.Lines[-1].Columns[-1].Blocks.Add( @{ text = { Get-GitStatusPowerline } } )
+        Add-PowerLineBlock { Get-GitStatusPowerline } -Line 0 -ForegroundColor "White" -BackgroundColor "DarkCyan"
 
         Set-GitPromptSettings -SeparatorText '' -BeforeText '' -BeforeChangesText '' -AfterChangesText '' -AfterNoChangesText '' `
                               -BranchText "§ " -BranchForeground White -BranchBackground Cyan `
@@ -203,7 +200,7 @@ function ConvertTo-StringArray {
     )
     $InputObject
 }
-
+Write-Verbose "Random Quotes Loaded"
 Trace-Message "Random Quotes Loaded"
 
 # Run these functions once
@@ -220,7 +217,7 @@ Set-Variable LiveID (
         [System.Security.Principal.WindowsIdentity]::GetCurrent().Groups |
         Where Value -match "^S-1-11-96" |
         ForEach Translate([System.Security.Principal.NTAccount]) |
-        ForEach Value) -Option Constant -ErrorAction SilentlyContinue
+        ForEach Value) -Option ReadOnly -ErrorAction SilentlyContinue
 
 # Unfortunately, in order for our File Format colors and History timing to take prescedence, we need to PREPEND the path:
 Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'Formats.ps1xml')
