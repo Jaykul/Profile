@@ -143,7 +143,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                                     # ANSI Colors are 30-37 and 90-97
                                     if ($host.UI.SupportsVirtualTerminal -and (Get-Command New-Text))
                                     {
-                                        $Text = New-Text $_.Name -Clear -Foreground White
+                                        $Text = New-Text $_.Name -Foreground White
                                         $Text.ForegroundColor = switch -regex ([System.IO.Path]::GetExtension($_.Name).Trim('.'))
                                         {
                                             '^(exe|com)$' # Applications

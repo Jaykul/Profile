@@ -1,4 +1,6 @@
-﻿# Only configure PSReadLine if it's already running
+﻿Import-Module -FullyQualifiedName @{ModuleName="xColors"; ModuleVersion="1.1.0"} -ErrorAction SilentlyContinue
+
+# Only configure PSReadLine if it's already running
 if(Get-Module PSReadline) {
     Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
     Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
@@ -54,9 +56,20 @@ function Set-HostColor {
     $Host.UI.RawUI.BackgroundColor = $BackgroundColor
     $Host.UI.RawUI.ForegroundColor = $ForegroundColor
 
-    if($Host.Name -ne "ConsoleHost") {
-        Write-Warning "Much of my profile assumes ConsoleHost + PSReadLine."
-        if($Host.Name -eq "Windows PowerShell ISE Host") {
+    switch($Host.Name) {
+        "ConsoleHost" {
+            $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
+            $Host.PrivateData.ErrorBackgroundColor    = $BackgroundColor
+            $Host.PrivateData.WarningForegroundColor  = "${Dark}Yellow"
+            $Host.PrivateData.WarningBackgroundColor  = $BackgroundColor
+            $Host.PrivateData.DebugForegroundColor    = "Green"
+            $Host.PrivateData.DebugBackgroundColor    = $BackgroundColor
+            $Host.PrivateData.VerboseForegroundColor  = "${Dark}Cyan"
+            $Host.PrivateData.VerboseBackgroundColor  = $BackgroundColor
+            $Host.PrivateData.ProgressForegroundColor = "DarkMagenta"
+            $Host.PrivateData.ProgressBackgroundColor = "Gray"
+        }
+        "Windows PowerShell ISE Host" {
             $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
             $Host.PrivateData.WarningForegroundColor  = "Gold"
             $Host.PrivateData.DebugForegroundColor    = "Green"
@@ -65,18 +78,12 @@ function Set-HostColor {
                 $Host.UI.RawUI.BackgroundColor = "DarkGray"
             }
         }
-        if(!$Force) { return }
-    } else {
-        $Host.PrivateData.ErrorForegroundColor    = "DarkRed"
-        $Host.PrivateData.ErrorBackgroundColor    = $BackgroundColor
-        $Host.PrivateData.WarningForegroundColor  = "${Dark}Yellow"
-        $Host.PrivateData.WarningBackgroundColor  = $BackgroundColor
-        $Host.PrivateData.DebugForegroundColor    = "Green"
-        $Host.PrivateData.DebugBackgroundColor    = $BackgroundColor
-        $Host.PrivateData.VerboseForegroundColor  = "${Dark}Cyan"
-        $Host.PrivateData.VerboseBackgroundColor  = $BackgroundColor
-        $Host.PrivateData.ProgressForegroundColor = "DarkMagenta"
-        $Host.PrivateData.ProgressBackgroundColor = "Gray"
+        "Visual Studio Code Host" {
+
+        }
+        default {
+            Write-Warning "Much of my profile assumes ConsoleHost + PSReadLine."
+        }
     }
 
     Set-PSReadlineOption -ContinuationPromptForegroundColor DarkGray -ContinuationPromptBackgroundColor $BackgroundColor -ContinuationPrompt "``  "

@@ -53,11 +53,10 @@ Copyright = '(c) 2016 Joel. All rights reserved.'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(@{ModuleName="Environment"; ModuleVersion="0.0"},
                     @{ModuleName="Configuration"; ModuleVersion="1.0.2"},
-                    @{ModuleName="Pansies"; ModuleVersion="0.1.0"},
-                    @{ModuleName="PSGit"; ModuleVersion="2.0.5"},
+                    @{ModuleName="Pansies"; ModuleVersion="1.0.0"},
+                    @{ModuleName="PSGit"; ModuleVersion="2.0.4"},
                     @{ModuleName="DefaultParameter"; ModuleVersion="1.6"},
-                    @{ModuleName="PowerLine"; ModuleVersion="2.2.2"},
-                    @{ModuleName="xColors"; ModuleVersion="1.1.0"})
+                    @{ModuleName="PowerLine"; ModuleVersion="2.3.0"})
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
