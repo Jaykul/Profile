@@ -1,6 +1,4 @@
-﻿Import-Module -FullyQualifiedName @{ModuleName="xColors"; ModuleVersion="1.1.0"} -ErrorAction SilentlyContinue
-
-# Only configure PSReadLine if it's already running
+﻿# Only configure PSReadLine if it's already running
 if(Get-Module PSReadline) {
     Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
     Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
@@ -102,30 +100,17 @@ function Set-HostColor {
     Set-PSReadlineOption -TokenKind None      -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
     Set-PSReadlineOption -TokenKind Comment   -ForegroundColor "DarkGray" -BackgroundColor $BackgroundColor
 
-    [PowerLine.Prompt]$global:PowerLinePrompt =  @(@(
-                @{ bg = "Blue";     fg = "White"; text = { $MyInvocation.HistoryId } }
-                @{ bg = "Cyan";     fg = "White"; text = { [PowerLine.Prompt]::Gear * $NestedPromptLevel } }
-                @{ bg = "Cyan";     fg = "White"; text = { if($pushd = (Get-Location -Stack).count) { "" + ([char]187) + $pushd } } }
-                @{ bg = "DarkBlue"; fg = "White"; text = { Get-SegmentedPath } }
-            ), @(
-                @{ text = { New-TextFactory (Get-Elapsed) -ErrorBackgroundColor DarkRed -ErrorForegroundColor White -ForegroundColor Black -BackgroundColor DarkGray } }
-                @{ bg = "Gray";     fg = "Black"; text = { Get-Date -f "T" } }
-            )), @(
-                #-ErrorBackgroundColor DarkRed -ErrorForegroundColor White
-                @{ bg = "White";    fg = "Black"; text = { "I " + ([PoshCode.Pansies.Text]@{ fg = "red";  text = "&hearts;" }) + ([PoshCode.Pansies.Text]@{ fg = "Black";  text = " PS" })  } }
-            )
+    # Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -PowerlineFont:(!$SafeCharacters) -Newline -Title {
+    #     "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name
+    # }
 
-    Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -PowerlineFont:(!$SafeCharacters) -Title { "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name }
-
-    if(Get-Module PSGit) {
-        Add-PowerLineBlock { Get-GitStatusPowerline } -Line 0 -ForegroundColor "White" -BackgroundColor "DarkCyan"
-
+    if(Get-Module PSGit -ErrorAction SilentlyContinue) {
         Set-GitPromptSettings -SeparatorText '' -BeforeText '' -BeforeChangesText '' -AfterChangesText '' -AfterNoChangesText '' `
-                              -BranchText "§ " -BranchForeground White -BranchBackground Cyan `
-                              -BehindByText '▼' -BehindByForeground White -BehindByBackground DarkCyan `
-                              -AheadByText '▲' -AheadByForeground White -AheadByBackground DarkCyan `
-                              -StagedChangesForeground White -StagedChangesBackground DarkBlue `
-                              -UnStagedChangesForeground White -UnStagedChangesBackground Blue
+                              -BranchText "§ " -BranchForeground 'xt229' -BranchBackground $null `
+                              -BehindByText '▼' -BehindByForeground 'xt183' -BehindByBackground $null `
+                              -AheadByText '▲' -AheadByForeground 'xt118' -AheadByBackground $null `
+                              -StagedChangesForeground White -StagedChangesBackground $null `
+                              -UnStagedChangesForeground Black -UnStagedChangesBackground $null
     }
 }
 
@@ -139,7 +124,7 @@ function Update-ToolPath {
     param()
 
     ## I add my "Scripts" directory and all of its direct subfolders to my PATH
-    [string[]]$folders = Get-ChildItem $ProfileDir\Tool[s], $ProfileDir\Utilitie[s], $ProfileDir\Scripts\*, $ProfileDir\Script[s] -ad | % FullName
+    [string[]]$folders = Get-ChildItem $ProfileDir\Tool[s], $ProfileDir\Utilitie[s], $ProfileDir\Script[s]\*, $ProfileDir\Script[s] -ad | % FullName
 
     ## Developer tools stuff ...
     ## I need InstallUtil, MSBuild, and TF (TFS) and they're all in the .Net RuntimeDirectory OR Visual Studio*\Common7\IDE
@@ -151,9 +136,9 @@ function Update-ToolPath {
     $folders += Set-AliasToFirst -Alias "msbuild" -Path 'C:\Program Files (x86)\MSBuild\*\Bin\MsBuild.exe' -Description "Visual Studio's MsBuild" -Force -Passthru
     $folders += Set-AliasToFirst -Alias "merge" -Path "C:\Program*Files*\Perforce\p4merge.exe","C:\Program*Files*\DevTools\Perforce\p4merge.exe" -Description "Perforce" -Force -Passthru
     $folders += Set-AliasToFirst -Alias "tf" -Path "C:\Program*Files*\*Visual?Studio*\Common7\IDE\TF.exe", "C:\Program*Files*\DevTools\*Visual?Studio*\Common7\IDE\TF.exe" -Description "Visual Studio" -Force -Passthru
-    # Side note: I search "D:" here, but you could put any USB drive letter ...
-    $folders += Set-AliasToFirst -Alias "Python","Python2","py2" -Path "C:\Python2*\python.exe", "D:\Python2*\python.exe" -Description "Python 2.x" -Force -Passthru
-    $folders += Set-AliasToFirst -Alias "Python3","py3" -Path "${Env:ProgramFiles}\Python3*\python.exe", "C:\Python3*\python.exe", "C:\Anaconda3\python.exe", "D:\Python3*\python.exe" -Description "Python 3.x" -Force -Passthru
+    # Side note: I search paths that are common on my systems here ...
+    $folders += Set-AliasToFirst -Alias "Python","Python2","py2" -Path "${Env:ProgramFiles}\Anaconda3\python.exe", "C:\Python2*\python.exe" -Description "Python 2.x" -Force -Passthru
+    $folders += Set-AliasToFirst -Alias "Python3","py3" -Path "${Env:ProgramFiles}\Anaconda3\python.exe", "C:\Anaconda3\python.exe", "${Env:ProgramFiles}\Python3*\python.exe", "C:\Python3*\python.exe" -Description "Python 3.x" -Force -Passthru
     Set-AliasToFirst -Alias "iis","iisexpress" -Path 'C:\Progra*\IIS*\IISExpress.exe' -Description "Personal Profile Alias"
     Trace-Message "Development aliases set"
 
@@ -216,7 +201,7 @@ Set-HostColor
 
 ## Get a random quote, and print it in yellow :D
 if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
-    Get-Quote | Write-Host -Foreground Yellow
+    Get-Quote | Write-Host -Foreground "xt214"
 }
 
 # If you log in with a Windows Identity, this will capture it

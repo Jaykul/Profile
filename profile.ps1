@@ -7,25 +7,39 @@ $TraceVerboseTimer.Start()
 Set-Variable ProfileDir (Split-Path $MyInvocation.MyCommand.Path -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 
 # Ensure that PSHome\Modules is there so we can load the default modules
-$Env:PSModulePath += ";$PSHome\Modules"
+$Env:PSModulePath += ";$PSHome\Modules;$Home\Projects\Modules"
 
 # These will get loaded automatically, but it's faster to load them explicitly all at once
 Import-Module Microsoft.PowerShell.Management,
               Microsoft.PowerShell.Security,
-              Microsoft.PowerShell.Utility,
-              Environment,
-              Configuration,
-              Pansies,
-              PSGit,
-              PowerLine,
-              Profile,
-              DefaultParameter,
-              xColors -Verbose:$false
+              Microsoft.PowerShell.Utility -Verbose:$false
+
+Import-Module -FullyQualifiedName @{
+                ModuleName="Environment";       ModuleVersion="1.0.4"},
+              @{ModuleName="Configuration";     ModuleVersion="1.0.4"},
+              @{ModuleName="Pansies";           ModuleVersion="1.2.0"},
+              @{ModuleName="PowerLine";         ModuleVersion="3.0.0"},
+              @{ModuleName="DefaultParameter";  ModuleVersion="1.0.0"}
+
+# Need to
+[System.Collections.Generic.List[ScriptBlock]]$global:Prompt =  @(
+    { $MyInvocation.HistoryId }
+    { "$([char]9587)" * $NestedPromptLevel }
+    { if($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
+    { Get-SegmentedPath }
+)
+
+Set-PowerLinePrompt -Newline
+
+Import-Module -FullyQualifiedName @{
+                ModuleName="PSGit";             ModuleVersion="2.1.0"} -Verbose:$false,
+              @{ModuleName="Profile";           ModuleVersion="1.2.0"} -Verbose:$false
 
 # For now, CORE edition is always verbose, because I can't test for KeyState
 if("Core" -eq $PSVersionTable.PSEdition) {
     $VerbosePreference = "Continue"
 } else {
+    # Import-Module xColors
     # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
     Add-Type -Assembly PresentationCore, WindowsBase
     try {
