@@ -100,9 +100,6 @@ function Set-HostColor {
     Set-PSReadlineOption -TokenKind None      -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
     Set-PSReadlineOption -TokenKind Comment   -ForegroundColor "DarkGray" -BackgroundColor $BackgroundColor
 
-    # Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -PowerlineFont:(!$SafeCharacters) -Newline -Title {
-    #     "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name
-    # }
 
     if(Get-Module PSGit -ErrorAction SilentlyContinue) {
         Set-GitPromptSettings -SeparatorText '' -BeforeText '' -BeforeChangesText '' -AfterChangesText '' -AfterNoChangesText '' `
@@ -198,6 +195,21 @@ Trace-Message "Random Quotes Loaded"
 # Run these functions once
 Update-ToolPath
 Set-HostColor
+
+# If I didn't have PowerLine, this is what I'd want
+[System.Collections.Generic.List[ScriptBlock]]$global:Prompt =  @(
+    { $MyInvocation.HistoryId }
+    { "$([char]9587)" * $NestedPromptLevel }
+    { if($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
+    { Get-SegmentedPath }
+)
+
+function prompt { (@($prompt).ForEach{$_.Invoke() -join "\" }.Where{$_} -join " ") + "> " }
+
+# Since I do have PowerLine, let's import that
+# Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -Timestamp -Newline -Title {
+#     "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name
+# }
 
 ## Get a random quote, and print it in yellow :D
 if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {

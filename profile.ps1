@@ -19,20 +19,7 @@ Import-Module -FullyQualifiedName @{
               @{ModuleName="Configuration";     ModuleVersion="1.0.4"},
               @{ModuleName="Pansies";           ModuleVersion="1.2.0"},
               @{ModuleName="PowerLine";         ModuleVersion="3.0.0"},
-              @{ModuleName="DefaultParameter";  ModuleVersion="1.0.0"}
-
-# Need to
-[System.Collections.Generic.List[ScriptBlock]]$global:Prompt =  @(
-    { $MyInvocation.HistoryId }
-    { "$([char]9587)" * $NestedPromptLevel }
-    { if($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
-    { Get-SegmentedPath }
-)
-
-Set-PowerLinePrompt -Newline
-
-Import-Module -FullyQualifiedName @{
-                ModuleName="PSGit";             ModuleVersion="2.1.0"} -Verbose:$false,
+              @{ModuleName="DefaultParameter";  ModuleVersion="1.0.0"},
               @{ModuleName="Profile";           ModuleVersion="1.2.0"} -Verbose:$false
 
 # For now, CORE edition is always verbose, because I can't test for KeyState
