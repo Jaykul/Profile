@@ -155,8 +155,8 @@ if(!(Test-Path $QuoteDir)) {
 # Only export $QuoteDir if it refers to a folder that actually exists
 Set-Variable QuoteDir (Resolve-Path $QuoteDir) -Description "Personal Quotes Path Source"
 
-Set-Alias gq Get-Quote
 function Get-Quote {
+    [CmdletBinding()][Alias("gq")]
     param(
         [Parameter(ValueFromRemainingArguments=$true)]
         [string]$Path = "${QuoteDir}\attributed quotes.txt",
@@ -171,45 +171,12 @@ function Get-Quote {
     Get-Content $Path | Where { $_ } | Get-Random -Count $Count
 }
 
-## The qq shortcut for quick quotes
-Set-Alias qq ConvertTo-StringArray
-function ConvertTo-StringArray {
-    <#
-        .Synopsis
-            Cast parameter array to string (see examples)
-        .Example
-            $array = qq there is no need to use quotes or commas to create a string array
-
-            Is the same as writing this, but with a lot less typing::
-            $array = "there", "is", "no", "need", "to", "use", "quotes", "or", "commas", "to", "create", "a", "string", "array"
-    #>
-    param(
-        [Parameter(ValueFromRemainingArguments=$true)]
-        [string[]]$InputObject
-    )
-    $InputObject
-}
 Write-Verbose "Random Quotes Loaded"
 Trace-Message "Random Quotes Loaded"
 
 # Run these functions once
 Update-ToolPath
 Set-HostColor
-
-# If I didn't have PowerLine, this is what I'd want
-[System.Collections.Generic.List[ScriptBlock]]$global:Prompt =  @(
-    { $MyInvocation.HistoryId }
-    { "$([char]9587)" * $NestedPromptLevel }
-    { if($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
-    { Get-SegmentedPath }
-)
-
-function prompt { (@($prompt).ForEach{$_.Invoke() -join "\" }.Where{$_} -join " ") + "> " }
-
-# Since I do have PowerLine, let's import that
-# Set-PowerLinePrompt -CurrentDirectory -RestoreVirtualTerminal -Timestamp -Newline -Title {
-#     "PowerShell - {0} ({1})" -f (Convert-Path $pwd),  $pwd.Provider.Name
-# }
 
 ## Get a random quote, and print it in yellow :D
 if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
