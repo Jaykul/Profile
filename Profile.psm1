@@ -1,27 +1,4 @@
-﻿# Only configure PSReadLine if it's already running
-if(Get-Module PSReadline) {
-    Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
-    Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
-    Set-PSReadlineKeyHandler Ctrl+R ReverseSearchHistory
-
-    Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
-    Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
-
-    Set-PSReadlineKeyHandler Ctrl+M SetMark
-    Set-PSReadlineKeyHandler Ctrl+Shift+M ExchangePointAndMark
-
-    Set-PSReadlineKeyHandler Ctrl+K KillLine
-    Set-PSReadlineKeyHandler Ctrl+I Yank
-    Trace-Message "PSReadLine fixed"
-
-    ## There were some problems with hosts using PSReadLine who shouldn't
-    if($Host.Name -ne "ConsoleHost") {
-        Remove-Module PSReadLine -ErrorAction SilentlyContinue
-        Trace-Message "PSReadLine skipped!"
-    }
-}
-
-function Set-HostColor {
+﻿function Set-HostColor {
     <#
         .Description
             Set more reasonable colors, because yellow is for warning, not verbose
@@ -84,28 +61,54 @@ function Set-HostColor {
         }
     }
 
-    Set-PSReadlineOption -ContinuationPromptForegroundColor DarkGray -ContinuationPromptBackgroundColor $BackgroundColor -ContinuationPrompt "``  "
-    Set-PSReadlineOption -EmphasisForegroundColor White -EmphasisBackgroundColor Gray
+    # Func`2           AddToHistoryHandler
+    # Action`1         CommandValidationHandler
+    # String           PromptText = ((prompt) -split "`n" | select -last 1)
+    # Int32            ExtraPromptLineCount = 2
+    # ViModeStyle      ViModeIndicator
+    # String           HistorySavePath
 
-    Set-PSReadlineOption -TokenKind Keyword   -ForegroundColor "${Dark}Yellow" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind String    -ForegroundColor "DarkGreen" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Operator  -ForegroundColor "DarkRed" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Number    -ForegroundColor "Red" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Variable  -ForegroundColor "${Dark}Magenta" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Command   -ForegroundColor "${Dark}Gray" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Parameter -ForegroundColor "DarkCyan" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Type      -ForegroundColor "Blue" -BackgroundColor $BackgroundColor
-
-    Set-PSReadlineOption -TokenKind Member    -ForegroundColor "Cyan" -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind None      -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
-    Set-PSReadlineOption -TokenKind Comment   -ForegroundColor "DarkGray" -BackgroundColor $BackgroundColor
-
+    $PSReadLineOption = @{
+        AnsiEscapeTimeout             = 100
+        BellStyle                     = "Audible"
+        Colors                        = @{
+            ContinuationPrompt = "DarkGray"
+            Emphasis           = $ForegroundColor
+            Error              = "Red"
+            Selection          = "Red"
+            Default            = $ForegroundColor
+            Comment            = "DarkGray"
+            Keyword            = "${Dark}Yellow"
+            String             = "DarkGreen"
+            Operator           = "DarkRed"
+            Variable           = "${Dark}Magenta"
+            Command            = "${Dark}Gray"
+            Parameter          = "DarkCyan"
+            Type               = "Blue"
+            Number             = "Red"
+            Member             = "Cyan"
+        }
+        CompletionQueryItems          = 100
+        ContinuationPrompt            = ">> "
+        DingDuration                  = 50 #ms
+        DingTone                      = 1221
+        EditMode                      = "Windows"
+        HistoryNoDuplicates           = $false
+        HistorySaveStyle              = "SaveIncrementally"
+        HistorySearchCaseSensitive    = $false
+        HistorySearchCursorMovesToEnd = $false
+        MaximumHistoryCount           = 1024
+        MaximumKillRingCount          = 10
+        ShowToolTips                  = $true
+        WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
+    }
+    Set-PSReadlineOption @PSReadLineOption
 
     if(Get-Module PSGit -ErrorAction SilentlyContinue) {
         Set-GitPromptSettings -SeparatorText '' -BeforeText '' -BeforeChangesText '' -AfterChangesText '' -AfterNoChangesText '' `
-                              -BranchText "§ " -BranchForeground 'xt229' -BranchBackground $null `
+                              -BranchText  "§ " -BranchForeground 'xt229'   -BranchBackground   $null `
                               -BehindByText '▼' -BehindByForeground 'xt183' -BehindByBackground $null `
-                              -AheadByText '▲' -AheadByForeground 'xt118' -AheadByBackground $null `
+                              -AheadByText  '▲' -AheadByForeground 'xt118'  -AheadByBackground  $null `
                               -StagedChangesForeground White -StagedChangesBackground $null `
                               -UnStagedChangesForeground Black -UnStagedChangesBackground $null
     }
@@ -129,18 +132,27 @@ function Update-ToolPath {
         $folders += [System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()
     }
 
-    ## MSBuild is now in 'C:\Program Files (x86)\MSBuild\{version}'
-    $folders += Set-AliasToFirst -Alias "msbuild" -Path 'C:\Program Files (x86)\MSBuild\*\Bin\MsBuild.exe' -Description "Visual Studio's MsBuild" -Force -Passthru
-    $folders += Set-AliasToFirst -Alias "merge" -Path "C:\Program*Files*\Perforce\p4merge.exe","C:\Program*Files*\DevTools\Perforce\p4merge.exe" -Description "Perforce" -Force -Passthru
-    $folders += Set-AliasToFirst -Alias "tf" -Path "C:\Program*Files*\*Visual?Studio*\Common7\IDE\TF.exe", "C:\Program*Files*\DevTools\*Visual?Studio*\Common7\IDE\TF.exe" -Description "Visual Studio" -Force -Passthru
-    # Side note: I search paths that are common on my systems here ...
-    $folders += Set-AliasToFirst -Alias "Python","Python2","py2" -Path "${Env:ProgramFiles}\Anaconda3\python.exe", "C:\Python2*\python.exe" -Description "Python 2.x" -Force -Passthru
-    $folders += Set-AliasToFirst -Alias "Python3","py3" -Path "${Env:ProgramFiles}\Anaconda3\python.exe", "C:\Anaconda3\python.exe", "${Env:ProgramFiles}\Python3*\python.exe", "C:\Python3*\python.exe" -Description "Python 3.x" -Force -Passthru
-    Set-AliasToFirst -Alias "iis","iisexpress" -Path 'C:\Progra*\IIS*\IISExpress.exe' -Description "Personal Profile Alias"
+    Set-AliasToFirst -Alias "iis","iisexpress" -Path 'C:\Progra*\IIS*\IISExpress.exe' -Description "IISExpress"
+    $folders += Set-AliasToFirst -Alias "msbuild" -Path 'C:\Program*Files*\*Visual?Studio*\*\*\MsBuild\*\Bin\MsBuild.exe', 'C:\Program*Files*\MSBuild\*\Bin\MsBuild.exe' -Description "Visual Studio's MsBuild" -Force -Passthru
+    $folders += Set-AliasToFirst -Alias "merge" -Path "C:\Program*Files*\Perforce\p4merge.exe" -Description "P4merge" -Force -Passthru
+    $folders += Set-AliasToFirst -Alias "tf" -Path "C:\Program*Files*\*Visual?Studio*\*\*\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team?Explorer\TF.exe", "C:\Program*Files*\*Visual?Studio*\Common7\IDE\TF.exe" -Description "TFVC" -Force -Passthru
+    $folders += Set-AliasToFirst -Alias "Python", "py" -Path "C:\Program*Files*\Anaconda3*\python.exe", "C:\Program*Files*\*Visual?Studio*\Shared\Anaconda3*\python.exe" -Description "Python 3.x" -Force -Passthru
+    ## I don't use Python2 lately, but I can't quite convince myself I won't need it again
+    #   $folders += Set-AliasToFirst -Alias "Python2", "py2" -Path "C:\Program*Files*\Anaconda3\python.exe", "C:\Python2*\python.exe" -Description "Python 2.x" -Force -Passthru
     Trace-Message "Development aliases set"
 
     $ENV:PATH = Select-UniquePath $folders ${Env:Path}
     Trace-Message "Env:PATH Updated"
+}
+
+function Reset-Module {
+    <#
+    .Synopsis
+        Remove and re-import a module to force a full reload
+    #>
+    param($ModuleName)
+    Microsoft.PowerShell.Core\Remove-Module $ModuleName
+    Microsoft.PowerShell.Core\Import-Module $ModuleName -Force -Pass -Scope Global | Format-Table Name, Version, Path -Auto
 }
 
 if(!$ProfileDir -or !(Test-Path $ProfileDir)) {
@@ -171,12 +183,11 @@ function Get-Quote {
     Get-Content $Path | Where { $_ } | Get-Random -Count $Count
 }
 
-Write-Verbose "Random Quotes Loaded"
-Trace-Message "Random Quotes Loaded"
-
 # Run these functions once
-Update-ToolPath
 Set-HostColor
+Update-ToolPath
+
+Trace-Message "Random Quotes Loaded"
 
 ## Get a random quote, and print it in yellow :D
 if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
@@ -189,6 +200,35 @@ Set-Variable LiveID (
         Where Value -match "^S-1-11-96" |
         ForEach Translate([System.Security.Principal.NTAccount]) |
         ForEach Value) -Option ReadOnly -ErrorAction SilentlyContinue
+
+function Update-PSReadLine {
+    Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
+    Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
+    Set-PSReadlineKeyHandler Ctrl+R ReverseSearchHistory
+
+    Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
+    Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
+    Set-PSReadLineKeyHandler Ctrl+Enter AcceptAndGetNext
+    Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
+
+    Set-PSReadlineKeyHandler Ctrl+M SetMark
+    Set-PSReadlineKeyHandler Ctrl+Shift+M ExchangePointAndMark
+
+    Set-PSReadlineKeyHandler Ctrl+K KillLine
+    Set-PSReadlineKeyHandler Ctrl+I Yank
+    Trace-Message "PSReadLine hotkeys fixed"
+
+    ## There were some problems with hosts using PSReadLine who shouldn't
+    if ($Host.Name -ne "ConsoleHost") {
+        Remove-Module PSReadLine -ErrorAction SilentlyContinue
+        Trace-Message "PSReadLine unloaded!"
+    }
+}
+
+# Only configure PSReadLine if it's already running
+if (Get-Module PSReadline) {
+    Update-PSReadLine
+}
 
 # Unfortunately, in order for our File Format colors and History timing to take prescedence, we need to PREPEND the path:
 Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'Formats.ps1xml')

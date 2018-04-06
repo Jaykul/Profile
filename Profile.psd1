@@ -12,7 +12,7 @@
 RootModule = 'Profile.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.1'
+ModuleVersion = '1.2.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -55,7 +55,6 @@ RequiredModules = @(@{ModuleName="Environment"; ModuleVersion="0.0"},
                     @{ModuleName="Configuration"; ModuleVersion="1.0.2"},
                     @{ModuleName="Pansies"; ModuleVersion="1.2.0"},
                     @{ModuleName="PowerLine"; ModuleVersion="3.0.0"},
-                   # @{ModuleName="PSGit"; ModuleVersion="2.1.0"},
                     @{ModuleName="DefaultParameter"; ModuleVersion="1.6"})
 
 # Assemblies that must be loaded prior to importing this module
