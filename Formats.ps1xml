@@ -306,13 +306,86 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                 </TableRowEntries>
             </TableControl>
         </View>
+        <View>
+            <Name>MatchInfo</Name>
+            <ViewSelectedBy>
+                <TypeName>Microsoft.PowerShell.Commands.MatchInfo</TypeName>
+            </ViewSelectedBy>
+            <CustomControl>
+                <CustomEntries>
+                    <CustomEntry>
+                        <CustomItem>
+                            <ExpressionBinding>
+                                <ScriptBlock>
+                                    [string]$curDir = $pwd.Path
+                                    if (!$host.UI.SupportsVirtualTerminal)
+                                    {
+                                        $_.ToString($curDir)
+                                        return
+                                    }
+
+                                    function FormatLine($matchInfo, [string]$line, [int]$lineNumber, [string]$displayPath, [string]$prefix, [switch]$isMatchLine)
+                                    {
+                                        if ($isMatchLine)
+                                        {
+                                            $esc = [char]0x1b
+                                            for($i = $matchInfo.Matches.Count -1; $i -ge 0; $i--){
+                                                $match = $matchInfo.Matches[$i]
+                                                $Line = $Line.Insert($match.Index + $match.Length, "$esc[0m").Insert($match.Index, (Get-PSReadLineOption).EmphasisColor)
+                                            }
+                                        }
+
+                                        if ($matchInfo.Path -ne 'InputStream')
+                                        {
+                                            "{0}{1}{2}$esc[0m:{3}{4}$esc[0m:{5}" -f (Get-PSReadLineOption).DefaultTokenColor, $prefix, $displayPath, (Get-PSReadLineOption).NumberColor, $lineNumber, $line
+                                        }
+                                        else
+                                        {
+                                            "{0}{1}" -f $prefix, $line
+                                        }
+                                    }
+
+                                    $displayPath = if ('' -eq $curDir) { $_.Path } else { $_.RelativePath($curDir) }
+                                    if ($null -eq $_.Context)
+                                    {
+                                        FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $_.LineNumber -DisplayPath $displayPath -Prefix "" -IsMatchLine
+                                    }
+                                    else
+                                    {
+                                        $lines = . {
+                                        $displayLineNumber = $_.LineNumber - $_.Context.DisplayPreContext.Length;
+                                        foreach ($contextLine in $_.Context.DisplayPreContext)
+                                        {
+                                            FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
+                                            $displayLineNumber += 1
+                                        }
+
+                                        FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "> " -IsMatchLine
+                                        $displayLineNumber += 1
+
+                                        foreach ($contextLine in $_.Context.DisplayPostContext)
+                                        {
+                                            FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
+                                            $displayLineNumber += 1
+                                        }
+                                        }
+
+                                        $lines -join ([Environment]::Newline)
+                                    }
+                                </ScriptBlock>
+                            </ExpressionBinding>
+                        </CustomItem>
+                    </CustomEntry>
+                </CustomEntries>
+            </CustomControl>
+        </View>
     </ViewDefinitions>
 </Configuration>
 <!-- SIG # Begin signature block -->
 <!-- MIIXzgYJKoZIhvcNAQcCoIIXvzCCF7sCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB -->
 <!-- gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR -->
-<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUTeBY/QteC4FbZXL84pC3cA2o -->
-<!-- NlKgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
+<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQ+8sqqEnNTrYs7WAgh2dGZ1f -->
+<!-- k+CgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
 <!-- AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG -->
 <!-- A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh -->
 <!-- d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg -->
@@ -386,20 +459,20 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
 <!-- 4pwUR6F6aGivm6dcIFzZcbEMj7uo+MUSaJ/PQMtARKUT8OZkDCUIQjKyNookAv4v -->
 <!-- cn4c10lFluhZHen6dGRrsutmQ9qzsIzV6Q3d9gEgzpkxYz0IGhizgZtPxpMQBvwH -->
 <!-- gfqL2vmCSfdibqFT+hKUGIUukpHqaGxEMrJmoecYpJpkUe8wggUwMIIEGKADAgEC -->
-<!-- AhAFmB+6PJIk/oqP7b4FPfHsMA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNVBAYTAlVT -->
+<!-- AhALDZkX0sdOvwJhwzQTbV+7MA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNVBAYTAlVT -->
 <!-- MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j -->
 <!-- b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p -->
-<!-- bmcgQ0EwHhcNMTcwNjE0MDAwMDAwWhcNMTgwNjAxMTIwMDAwWjBtMQswCQYDVQQG -->
+<!-- bmcgQ0EwHhcNMTgwNzEyMDAwMDAwWhcNMTkwNzE2MTIwMDAwWjBtMQswCQYDVQQG -->
 <!-- EwJVUzERMA8GA1UECBMITmV3IFlvcmsxFzAVBgNVBAcTDldlc3QgSGVucmlldHRh -->
 <!-- MRgwFgYDVQQKEw9Kb2VsIEguIEJlbm5ldHQxGDAWBgNVBAMTD0pvZWwgSC4gQmVu -->
-<!-- bmV0dDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANALmLHevB7LvTmI -->
-<!-- p2oVErnz915fP1JUKoC+/5BRWUtAGooxg95jxX8+qT1yc02ZnkK7u1UyM0Mfs3b8 -->
-<!-- MzhSqe5OkkQeT2RHrGe52+0/0ZWD68pvUBZoMQxrAnWJETjFO6IoXPKmoXN3zzpF -->
-<!-- +5s/UIbNGI5mdiN4v4F93Yaajzu2ymsJsXK6NgRh/AUbUzUlefpOas+o06wT0vqp -->
-<!-- LniGWw26321zJo//2QEo5PBrJvDDDIBBN6Xn5A2ww6v6fH2KGk2qf4vpr58rhDIH -->
-<!-- fLOHLg9s35effaktygUMQBCFmxOAbPLKWId8n5+O7zbMfKw3qxqCp2QeXhjkIh9v -->
-<!-- ETIX9pECAwEAAaOCAcUwggHBMB8GA1UdIwQYMBaAFFrEuXsqCqOl6nEDwGD5LfZl -->
-<!-- dQ5YMB0GA1UdDgQWBBQ8xh3xoTXbMfJUSyFBfPsrxoD8XzAOBgNVHQ8BAf8EBAMC -->
+<!-- bmV0dDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMJb3Cf3n+/pFJiO -->
+<!-- hQqN5m54FpyIktMRWe5VyF8465BnAtzw3ivMyN+3k8IoXQhMxpCsY1TJbLyydNR2 -->
+<!-- QzwEEtGfcTVnlAJdFFlBsgIdK43waaML5EG7tzNJKhHQDiN9bVhLPTXrit80eCTI -->
+<!-- RpOA7435oVG8erDpxhJUK364myUrmSyF9SbUX7uE09CJJgtB7vqetl4G+1j+iFDN -->
+<!-- Xi3bu1BFMWJp+TtICM+Zc5Wb+ZaYAE6V8t5GCyH1nlAI3cPjqVm8y5NoynZTfOhV -->
+<!-- bHiV0QI2K5WrBBboR0q6nd4cy6NJ8u5axi6CdUhnDMH20NN2I0v+2MBkgLAzxPrX -->
+<!-- kjnaEGECAwEAAaOCAcUwggHBMB8GA1UdIwQYMBaAFFrEuXsqCqOl6nEDwGD5LfZl -->
+<!-- dQ5YMB0GA1UdDgQWBBTiwur/NVanABEKwjZDB3g6SZN1mTAOBgNVHQ8BAf8EBAMC -->
 <!-- B4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwdwYDVR0fBHAwbjA1oDOgMYYvaHR0cDov -->
 <!-- L2NybDMuZGlnaWNlcnQuY29tL3NoYTItYXNzdXJlZC1jcy1nMS5jcmwwNaAzoDGG -->
 <!-- L2h0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9zaGEyLWFzc3VyZWQtY3MtZzEuY3Js -->
@@ -408,33 +481,33 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
 <!-- JAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBOBggrBgEFBQcw -->
 <!-- AoZCaHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0U0hBMkFzc3Vy -->
 <!-- ZWRJRENvZGVTaWduaW5nQ0EuY3J0MAwGA1UdEwEB/wQCMAAwDQYJKoZIhvcNAQEL -->
-<!-- BQADggEBAGvlfIiin9JAyL16oeCNApnAWLfZpUBob4D+XLzdRJXidPq/pvNkE9Rg -->
-<!-- pRZFaWs30f2WPhWeqCpSCahoHzFsD5S9mOzsGTXsT+EdjAS0yEe1t9LfMvEC/pI3 -->
-<!-- aBQJeJ/DdgpTMUEUJSvddc0P0NbDJ6TJC/niEMOJ8XvsfF75J4YVJ10yVNahbAuU -->
-<!-- MrRrRLe30pW74MRv1s7SKxwPmLhcsMQuK0mWGERtGYMwDHwW0ZdRHKNDGHRsl0Wh -->
-<!-- DS1P8+JRpE3eNFPcO17yiOfKDnVh+/1AOg7QopD6R6+P9rErorebsvW680s4WTlr -->
-<!-- hDcMsTOX0js2KFF6uT4nSojS4GNlSxExggQ3MIIEMwIBATCBhjByMQswCQYDVQQG -->
+<!-- BQADggEBADNNHuRAdX0ddONqaUf3H3pwa1K016C02P90xDIyMvw+hiUb4Z/xewnY -->
+<!-- jyplspD0NQB9ca2pnNIy1KwjJryRgq8gl3epSiWTbViVn6VDK2h0JXm54H6hczQ8 -->
+<!-- sEshCW53znNVUUUfxGsVM9kMcwITHYftciW0J+SsGcfuuAIuF1g47KQXKWOMcUQl -->
+<!-- yrP5t0ywotTVcg/1HWAPFE0V0sFy+Or4n81+BWXOLaCXIeeryLYncAVUBT1DI6lk -->
+<!-- peRUj/99kkn+hz1q4hHTtfNpMTOApP64EEFGKICKkJdvhs1PjtGa+QdAkhcInTxk -->
+<!-- t/hIJPUb1nO4CsKp1gaVsRkkbcStJ2kxggQ3MIIEMwIBATCBhjByMQswCQYDVQQG -->
 <!-- EwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cuZGlnaWNl -->
 <!-- cnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBTSEEyIEFzc3VyZWQgSUQgQ29kZSBT -->
-<!-- aWduaW5nIENBAhAFmB+6PJIk/oqP7b4FPfHsMAkGBSsOAwIaBQCgeDAYBgorBgEE -->
+<!-- aWduaW5nIENBAhALDZkX0sdOvwJhwzQTbV+7MAkGBSsOAwIaBQCgeDAYBgorBgEE -->
 <!-- AYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwG -->
-<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSS36P7 -->
-<!-- oGgOLvPBRK9nxTqxjxOHQjANBgkqhkiG9w0BAQEFAASCAQC3xK5YdIr8IZ7/qigF -->
-<!-- NcZ6ujAov0GZ8M+vY+9tKtGqSgFQDCqH/eF6qwx6QouiYjHOuUIt9bDDyybdpTh6 -->
-<!-- iiYRgk6j+BTwffTnJoA82vuPLHb91+vIIB1E6pUZOEr9oYdM8QgfIaGdQLRylVg7 -->
-<!-- MP6CCBmH+/0Bczpu8AKilNVsiCt85rnwPKrkiyzHz+R9cs7VkXbaO2szR4vI16R+ -->
-<!-- wBEnArx3vlTg7WSmcKazW3Gc/ePfKGdoYzvGBicpAxyZECYNOx3lNLE7JBLd9e2G -->
-<!-- oUAr2Xk+F6Tsd/lH7DGCQrV0fTAoNKAUE6SJewBuTNWG1RjeCWdf+5UNRfIBPXmm -->
-<!-- 7ca0oYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
+<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRYDk6V -->
+<!-- g6orBRMQHRYViX81ZCFaETANBgkqhkiG9w0BAQEFAASCAQAkbhujhPAMj9B6udfH -->
+<!-- QhJ57bxSrqvmklIIIdHYLDfjB6gWNLJTF55QBUoHIqf50H5PBHH8RemXTL0zMlqt -->
+<!-- 4HAYGsN1cdUQK3LfytpWYJaWVZ1nLTqZYhTdEQBj+eJPqUgLm/Adlw85S8XXaR58 -->
+<!-- U3bQUkD1zV/aR3N5TNT9/tDsE8Vem3Zjjj4QSZDqfPiRGlRAlUa+cf5SH+Z5nld4 -->
+<!-- K6NYzII3fCwwGGwfEBOy5tzvJ1ZSLWDIxABodm8pt6k6Psv93k5WOkmLZDqE2nV3 -->
+<!-- 8utH/UjRwxPVSsR5TvRhYww1xVk11PxTz9i+plOIoPlMe4IHSgts9xl7/T3avANj -->
+<!-- 2mcCoYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
 <!-- VVMxHTAbBgNVBAoTFFN5bWFudGVjIENvcnBvcmF0aW9uMTAwLgYDVQQDEydTeW1h -->
 <!-- bnRlYyBUaW1lIFN0YW1waW5nIFNlcnZpY2VzIENBIC0gRzICEA7P9DjI/r81bgTY -->
 <!-- apgbGlAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ -->
-<!-- KoZIhvcNAQkFMQ8XDTE4MDUzMDA0Mjc1M1owIwYJKoZIhvcNAQkEMRYEFBl47Njl -->
-<!-- axWylTDlw3Ggt+NRrLAgMA0GCSqGSIb3DQEBAQUABIIBADs30R/8PhTvi2VVdHCl -->
-<!-- xR2rZshFcLhGSnrTZpv1GnqPpnfccGtUPPUdOQw1SzsNLmA1//R3ABRndN1KjN1l -->
-<!-- J21QrP1/M01YqvsuW+uKxHp2n/dp7ESD0wqX2NZ7POZqPD0UjK0YZfxhvxqzSuGy -->
-<!-- 4liP5TKkig1L+06VpFGPXjMSWVgQ3awEM+NA4iRfnhk2+1p5LRwot7RhQdjVU3Tc -->
-<!-- p4wAsjYXFh31fmcBL7GKlyQ8y0yGnrMkF+Yi5VRbioijus4oZ+MkAXPrDUQQghb6 -->
-<!-- YMVQkCPOfaNvWbBUbvLr//sJBrNFCd3cPCpyOONd8U9VLfqtaWxGEc/5VZBgJQpU -->
-<!-- Du8= -->
+<!-- KoZIhvcNAQkFMQ8XDTE4MDgxODE3MTE1NFowIwYJKoZIhvcNAQkEMRYEFM2Y7GQ2 -->
+<!-- ZKdqKnrqq66I50qw3MR8MA0GCSqGSIb3DQEBAQUABIIBACZXmrATBHUAye/bQxv4 -->
+<!-- 2AGC4qJlltZ0zn0dlWHeOYabdAJM2w3f7dYLj4HnD7H1zWxvPi/ZFePQop4Su3TE -->
+<!-- aUAMbpvMqtSudGsfYspGovLMmvCW49eNBTS/HztVuSTKWfUK6UIoJfw0px8Yhgt8 -->
+<!-- C1yCWdEsUFN0kVD5jJ8+lNnOjUt2UC/Qx5GrEHJziXA43q//FT4CFfVVveF6UixR -->
+<!-- dg6xExTGeyyqc05tSAac7TaNV4NvxZLhnLfsvvrGi9DhLsCMn1FwJMwoI3lCqtt2 -->
+<!-- btIYXFUW4A6IaFA8uQzmS47R8K9LiaUXD0aMOLl6acaxYhA44sALpI/9KEA8XcMF -->
+<!-- gOs= -->
 <!-- SIG # End signature block -->

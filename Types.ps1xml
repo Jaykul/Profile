@@ -76,28 +76,12 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
             </ScriptProperty>
         </Members>
     </Type>
-    <Type>
-        <Name>Microsoft.PowerShell.Commands.MatchInfo</Name>
-        <Members>
-            <ScriptMethod>
-                <Name>ToString</Name>
-                <Script>
-                    $line = $this.Line
-                    for($i = $this.Matches.Count -1; $i -ge 0; $i--){
-                        $match = $this.Matches[$i]
-                        $line = $Line.Insert($match.Index + $match.Length, "$([char]27)[39m").Insert($match.Index, (Get-PSReadLineOption).EmphasisColor)
-                    }
-                    $line
-                </Script>
-            </ScriptMethod>
-        </Members>
-    </Type>
 </Types>
 <!-- SIG # Begin signature block -->
 <!-- MIIXzgYJKoZIhvcNAQcCoIIXvzCCF7sCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB -->
 <!-- gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR -->
-<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlkvfKXp2dz7gP32HXlaCeTNJ -->
-<!-- k1qgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
+<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUytFqfB3/vUJB6RgKQg/nPJp7 -->
+<!-- 9rCgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
 <!-- AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG -->
 <!-- A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh -->
 <!-- d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg -->
@@ -203,23 +187,23 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
 <!-- cnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBTSEEyIEFzc3VyZWQgSUQgQ29kZSBT -->
 <!-- aWduaW5nIENBAhALDZkX0sdOvwJhwzQTbV+7MAkGBSsOAwIaBQCgeDAYBgorBgEE -->
 <!-- AYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwG -->
-<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQQcmdR -->
-<!-- UMFP46CqBWjREjJHGvZuLzANBgkqhkiG9w0BAQEFAASCAQArAWwBfZVPOzWQ+NRo -->
-<!-- SG3CSBgIvzSC+D+XnJlPsssKdHYMNpadJIUHAGCZJ7GKkGJcQ0lvGEpGFCUT58BY -->
-<!-- aVE4IIuHcblA14rDJVpyl+IYnO+ooMT1NVnWZHCjfKpA44AprHcIv/h+jwmsjLiV -->
-<!-- 7HI6klM9r/gyvu2/duOCNEChtAMYdue4EFjrfW/NxNv+E3FN47RKfRG+v+8na0PM -->
-<!-- 2v6I/GlXC27mjYLXj7MjEjRUF9k1jlYD3XHUgX6hf6wqWWKMs4aocHKthXeIl88p -->
-<!-- huoyYW/GZBWdpcsfDiqa6dtyaduYsWlpFE1+AR9zfL5dKJHQ4OsfBGOIcLn/UD2v -->
-<!-- w3wUoYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
+<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSX11yY -->
+<!-- zoBAzayHWr6rAcFgGBrWATANBgkqhkiG9w0BAQEFAASCAQAzEOrZFZvgrORXVqIw -->
+<!-- FMynq5e/heLBp1mMPSLAgJ6jVA15Dw7HqLkluRf6a5YhU+vIeK8po2vrdE+EOTbQ -->
+<!-- GAjKfHGv0GphCb9qGdi+lC5KpNXmhW4HMJSh89giu/xrJSr8AYl5vP05jv8ZHvta -->
+<!-- ihgM2D8qnmzRJ16evMduuAEUKif/KINGJ1ih7OCEPH31h/QGa1cV7cm13SNyrTvx -->
+<!-- cWuLBem25OzpYP2mkXVOLb9K/zM0hUdh6jsawTkb01eEznBf0YQyS1Rmn+JHSkEO -->
+<!-- ub+zd+lkcNBPvRjKt9R5/9HhctmOEPH2E5mL9MdDRoKrkrKcP9q38nnDORiPer/J -->
+<!-- mY7foYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
 <!-- VVMxHTAbBgNVBAoTFFN5bWFudGVjIENvcnBvcmF0aW9uMTAwLgYDVQQDEydTeW1h -->
 <!-- bnRlYyBUaW1lIFN0YW1waW5nIFNlcnZpY2VzIENBIC0gRzICEA7P9DjI/r81bgTY -->
 <!-- apgbGlAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ -->
-<!-- KoZIhvcNAQkFMQ8XDTE4MDgxODE2MzM0MFowIwYJKoZIhvcNAQkEMRYEFNwxr9Do -->
-<!-- HZY4Xotve1xjqG1QIpWJMA0GCSqGSIb3DQEBAQUABIIBAGH4XBvmJHa+DCRywFgK -->
-<!-- AHiXyvWDRlPXhaRPWEjglQ6557ZfLhzYExNAafAyr2d22zcz8w6b8ZsTVq8yRaK6 -->
-<!-- G87xJ2gTplDkXQR/VXsgkwyT8CO+om/Ewqv0rXVg2TZldkkOIxIYak/J6nmpa3CU -->
-<!-- d8GYTEscYYjo+42+43A4Ndrv9E+AtoT7t+6X/wh1hjvvsDer23xwNkSwNAwEMQoD -->
-<!-- fbvn/JEdTQkXJwCsz7pO74N+Oc1lwlMeORWpJaD9INDzVf2lo8Mc3fm0G2R7ooHx -->
-<!-- JPUc3MGAhbIJKFTP+2gnuWS6n9GIe2klaWhrj+JSbn2n3GvUmEqHmyatIdS/N+bn -->
-<!-- MUo= -->
+<!-- KoZIhvcNAQkFMQ8XDTE4MDgxODE3MDcwM1owIwYJKoZIhvcNAQkEMRYEFKkz339T -->
+<!-- wTVkOtfVSlRKJ1a3hIooMA0GCSqGSIb3DQEBAQUABIIBABMM97QQpXloYLnGvnyO -->
+<!-- Jt0N1jvYoxKWeEAfHr5MRZ1iPcsrQMdS61yhPaSn2EtgWiOg26Z8t0fD5xMGyena -->
+<!-- p7eDPrxoDIT3L2+qjOWtz0ukV1l1eZK3bpgUFKyaUAvAxYdw3hOEvdFgpTkeahMU -->
+<!-- VaD7Yf+oS5FvlxfwzsNF0biu+YYRPiplGc8IM9tF+iVfw8lQc9DrEF7JUpvUViC+ -->
+<!-- 2l3mFig2egN6OMIMgZF5BnAvPEhrtHfpZH1TmkeKD7WoSuhabXlqXD/G8Kr+Q3S/ -->
+<!-- wRkkX50JCEZSQaOW7zKwSAMBzqR9NWj4JtG9ud03njutak6CaQL7Za4dZqIVWp/T -->
+<!-- L7w= -->
 <!-- SIG # End signature block -->
