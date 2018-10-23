@@ -53,7 +53,7 @@ Copyright = '(c) 2016 Joel. All rights reserved.'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.0.4" },
                     @{ ModuleName="Configuration";    ModuleVersion="1.2.1" },
-                    @{ ModuleName="Pansies";          ModuleVersion="1.3.0" },
+                    @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
                     @{ ModuleName="PowerLine";        ModuleVersion="3.0.5" },
                     @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" })
 

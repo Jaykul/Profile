@@ -25,7 +25,7 @@ Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope
 # Note these are dependencies of the Profile module, but it's faster to load them explicitly up front
 Import-Module -FullyQualifiedName @{ ModuleName = "Environment";       ModuleVersion = "1.0.4" },
                                   @{ ModuleName = "Configuration";     ModuleVersion = "1.2.1" },
-                                  @{ ModuleName = "Pansies";           ModuleVersion = "1.3.0" },
+                                  @{ ModuleName = "Pansies";           ModuleVersion = "1.4.0" },
                                   @{ ModuleName = "PowerLine";         ModuleVersion = "3.0.5" },
                                   @{ ModuleName = "DefaultParameter";  ModuleVersion = "1.7.0" } # -Verbose:$false
 
