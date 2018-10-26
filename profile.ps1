@@ -4,23 +4,25 @@ $TraceVerboseTimer = New-Object System.Diagnostics.Stopwatch
 $TraceVerboseTimer.Start()
 ${;} = [System.IO.Path]::PathSeparator
 
+## Set the profile directory first, so we can refer to it from now on.
+Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
+
 # Ensure that PSHome\Modules is there so we can load the default modules
 # Azure CloudShell doesn't seem to have a Modules path that's part of clouddrive yet
 # I want to prioritize "this" location (CloudDrive) because
 # CloudShell's PSReadLine & PackageManagement modules are out of date
 $Env:PSModulePath += @(Split-Path $PSScriptRoot) +
+                     @(split-path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
                      @($Env:PSModulePath -split ${;}) +
                      @("$PSHome\Modules", "$Home\Projects\Modules") -join ${;}
 
 # Azure CloudShell pwsh freaks out if you try to load these explicitly.
 # # # # # # # # # # # Bleeping Computer # # # # # # # # # # #
-# # Note these normally get loaded automatically, but it's faster to load them explicitly up front
+# # These get loaded automatically anyway, it's just faster to load them explicitly up front
 # Import-Module Microsoft.PowerShell.Management,
 #               Microsoft.PowerShell.Security,
 #               Microsoft.PowerShell.Utility -Verbose:$false
 
-## Set the profile directory first, so we can refer to it from now on.
-Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 
 # Note these are dependencies of the Profile module, but it's faster to load them explicitly up front
 Import-Module -FullyQualifiedName @{ ModuleName = "Environment";       ModuleVersion = "1.0.4" },
