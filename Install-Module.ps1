@@ -38,7 +38,11 @@ try {
 
     $Gallery = Get-PSRepository PSGallery
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    Install-Module -AllowClobber -Scope:$Scope -Name @((Get-Module Profile -ListAvailable).RequiredModules)
+
+    Find-Module (Get-Module Profile -ListAvailable).RequiredModules | 
+        Find-Module -AllowPrerelease |
+        Install-Module -Scope:$Scope -RequiredVersion { $_.Version } -AllowPrerelease -AllowClobber
+   
     Set-PSRepository -Name PSGallery -InstallationPolicy $Gallery.InstallationPolicy
 
 } finally {
