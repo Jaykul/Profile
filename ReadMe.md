@@ -11,6 +11,9 @@ Feel free to ask for explanation of anything you want to know.
 If you really want a copy of it, you can use the [Install-Module.ps1](https://github.com/Jaykul/Profile/blob/master/Install-Module.ps1) to install it on your box:
 
 ```posh
+# Windows defaults to Tls1.1 which won't work with this github URL
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 iex (irm https://github.com/Jaykul/Profile/raw/master/Install-Module.ps1)
 ```
 Or you can just install all the required modules, and run `Set-PowerLinePrompt`:
