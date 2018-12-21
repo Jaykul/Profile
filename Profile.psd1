@@ -55,6 +55,7 @@ RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.0.4" },
                     @{ ModuleName="Configuration";    ModuleVersion="1.2.1" },
                     @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
                     @{ ModuleName="PowerLine";        ModuleVersion="3.0.5" },
+                    @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" },
                     @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" })
 
 # Assemblies that must be loaded prior to importing this module
