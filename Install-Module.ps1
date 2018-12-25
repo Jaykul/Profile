@@ -12,7 +12,7 @@ try {
     if(Test-Path Profile-master){
         Write-Error "The Profile-master folder already exists, install cannot continue."
     }
-    if(Test-Path Profile){
+    if (Test-Path Profile){
         Write-Warning "The Profile module already exists, install will overwrite it and put the old one in Profile/old."
         Remove-Item Profile/old -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -23,7 +23,7 @@ try {
     Expand-Archive Profile-master.zip .
     $null = mkdir Profile-master\old
 
-    if(Test-Path Profile) {
+    if (Test-Path Profile) {
         Move-Item Profile\* Profile-master\old
         Remove-Item Profile
     }
@@ -31,8 +31,8 @@ try {
     Rename-Item Profile-master Profile
     Remove-Item Profile-master.zip
 
-    if (Test-Path $Profile.CurrentUserAllHosts) {
-        Write-Warning "Profile.ps1 already exists. Leaving new profile in ~\Documents\WindowsPowerShell\Profile"
+    if (!$Force -and (Test-Path $Profile.CurrentUserAllHosts)) {
+        Write-Warning "Profile.ps1 already exists. Leaving new profile in $($Profile.CurrentUserAllHosts)"
     } else {
         Set-Content $Profile.CurrentUserAllHosts @'
         $Actual = @(
@@ -49,7 +49,9 @@ try {
     $Gallery = Get-PSRepository PSGallery
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
-    Find-Module (Get-Module Profile -ListAvailable).RequiredModules | 
+    $RequiredModules = (Get-Module Profile -ListAvailable).RequiredModules.Name
+    Write-Host "Installing Required Modules in Scope:$Scope $($RequiredModules -join ', ')"
+    Find-Module $RequiredModules | 
         Find-Module -AllowPrerelease |
         Install-Module -Scope:$Scope -RequiredVersion { $_.Version } -AllowPrerelease -AllowClobber
    
