@@ -4,8 +4,8 @@ param(
     [ValidateSet("CurrentUser","AllUser")]
     $Scope = "CurrentUser"
 )
-
-mkdir ~\Documents\WindowsPowerShell\Modules -force | convert-path | Push-location
+$ProfileDir = Split-Path $Profile.CurrentUserAllHosts
+mkdir $ProfileDir\Modules -force | convert-path | Push-location
 
 try {
     $ErrorActionPreference = "Stop"
@@ -31,9 +31,19 @@ try {
     Rename-Item Profile-master Profile
     Remove-Item Profile-master.zip
 
-    Move-Item Profile\profile.ps1 ~\Documents\WindowsPowerShell\ -Force:$Force -ErrorAction SilentlyContinue -ErrorVariable MoveFailed
-    if($MoveFailed) {
+    if (Test-Path $Profile.CurrentUserAllHosts) {
         Write-Warning "Profile.ps1 already exists. Leaving new profile in ~\Documents\WindowsPowerShell\Profile"
+    } else {
+        Set-Content $Profile.CurrentUserAllHosts @'
+        $Actual = @(
+            "$PSScriptRoot\Modules\Profile\profile.ps1"
+            "A:\.pscloudshell\PowerShell\Modules\Profile\profile.ps1"
+            "$Home\Projects\Modules\Profile\profile.ps1"
+        ).Where({Test-Path $_}, 1)
+        
+        Write-Host "Profile: $Actual"
+        . $Actual
+'@ -Encoding ascii
     }
 
     $Gallery = Get-PSRepository PSGallery
