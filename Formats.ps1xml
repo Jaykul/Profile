@@ -307,6 +307,65 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
             </TableControl>
         </View>
         <View>
+            <Name>CommandInfo</Name>
+            <ViewSelectedBy>
+                <TypeName>System.Management.Automation.CmdletInfo</TypeName>
+                <TypeName>System.Management.Automation.FunctionInfo</TypeName>
+                <TypeName>System.Management.Automation.FilterInfo</TypeName>
+                <TypeName>System.Management.Automation.AliasInfo</TypeName>
+                <TypeName>System.Management.Automation.ApplicationInfo</TypeName>
+                <TypeName>System.Management.Automation.ScriptInfo</TypeName>
+                <TypeName>System.Management.Automation.ExternalScriptInfo</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>CommandType</Label>
+                        <Width>15</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Name</Label>
+                        <Width>50</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Version</Label>
+                        <Width>10</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Source</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                              <PropertyName>CommandType</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                              <ScriptBlock>
+                                if ($_.CommandType -eq "Alias") {
+                                  if ($this.ResolvedCommand -ne $null) {
+                                    $this.Name + " -> " + $this.ResolvedCommand.Name
+                                  } else {
+                                    $this.Name + " -> " + $this.Definition
+                                  }
+                                } else {
+                                  $_.Name
+                                }
+                              </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Version</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Source</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
             <Name>MatchInfo</Name>
             <ViewSelectedBy>
                 <TypeName>Microsoft.PowerShell.Commands.MatchInfo</TypeName>
