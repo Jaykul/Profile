@@ -4,17 +4,23 @@ $TraceVerboseTimer = New-Object System.Diagnostics.Stopwatch
 $TraceVerboseTimer.Start()
 ${;} = [System.IO.Path]::PathSeparator
 
+# The job of the profile script is to:
+# 1. Fix the PSModulePath and then
+# 2. Import the Profile module (which this script is part of, technically)
+
 ## Set the profile directory first, so we can refer to it from now on.
 Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 
-# Ensure that PSHome\Modules is there so we can load the default modules
-# Azure CloudShell doesn't seem to have a Modules path that's part of clouddrive yet
-# I want to prioritize "this" location (CloudDrive) because
-# CloudShell's PSReadLine & PackageManagement modules are out of date
-$Env:PSModulePath += @(Split-Path $PSScriptRoot) +
-                     @(split-path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
-                     @($Env:PSModulePath -split ${;}) +
-                     @("$PSHome\Modules", "$Home\Projects\Modules") -join ${;}
+# Prioritize "this" location (probably CloudDrive, but possibly my Projects folder)
+$Env:PSModulePath = @(Split-Path $PSScriptRoot) +
+                    # The normal FIRST module location is where the profile lives
+                    @(Join-Path $ProfileDir Modules | Convert-Path) +
+                    @($Env:PSModulePath -split ${;}) +
+                    # Ever an optimist, I'll include the _other_ PowerShell\Modules path too
+                    @(Split-Path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
+                    # Guarantee that PSHome\Modules is there so we can load the default modules
+                    # Guarantee my ~\Projects\Modules are there so I can load my dev projects
+                    @("$PSHome\Modules", "$Home\Projects\Modules") -join ${;}
 
 # Azure CloudShell pwsh freaks out if you try to load these explicitly.
 # # # # # # # # # # # Bleeping Computer # # # # # # # # # # #
@@ -22,7 +28,6 @@ $Env:PSModulePath += @(Split-Path $PSScriptRoot) +
 # Import-Module Microsoft.PowerShell.Management,
 #               Microsoft.PowerShell.Security,
 #               Microsoft.PowerShell.Utility -Verbose:$false
-
 
 # Note these are dependencies of the Profile module, but it's faster to load them explicitly up front
 Import-Module -FullyQualifiedName @{ ModuleName = "Environment";       ModuleVersion = "1.0.4" },
