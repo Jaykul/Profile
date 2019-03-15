@@ -14,6 +14,30 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
         </Members>
     </Type>
     <Type>
+      <Name>System.IO.FileInfo</Name>
+      <Members>
+        <ScriptMethod>
+          <Name>GetHash</Name>
+          <Script>
+            param([ValidateSet("SHA1","SHA256","SHA384","SHA512","MD5")]$Algorithm="SHA256")
+            Get-FileHash $this.FullName $Algorithm
+          </Script>
+        </ScriptMethod>
+        <ScriptProperty>
+          <Name>Sha256</Name>
+          <GetScriptBlock>
+            $this.GetHash()
+          </GetScriptBlock>
+        </ScriptProperty>
+        <ScriptProperty>
+          <Name>MD5</Name>
+          <GetScriptBlock>
+            $this.GetHash("MD5")
+          </GetScriptBlock>
+        </ScriptProperty>
+      </Members>
+    </Type>
+    <Type>
         <Name>Microsoft.PowerShell.Commands.MemberDefinition</Name>
         <Members>
             <ScriptProperty>
