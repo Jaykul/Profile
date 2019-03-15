@@ -12,7 +12,7 @@
 RootModule = 'Profile.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.2'
+ModuleVersion = '1.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -21,13 +21,13 @@ ModuleVersion = '1.2.2'
 GUID = 'c1446ada-0641-42ac-a3b5-1524a33378a2'
 
 # Author of this module
-Author = 'Joel'
+Author = 'Joel Bennett'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+CompanyName = 'PoshCode.org'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Joel. All rights reserved.'
+Copyright = '(c) 2016-2019 Joel Bennett. All rights reserved.'
 
 # Description of the functionality provided by this module
 # Description = ''
@@ -51,8 +51,8 @@ Copyright = '(c) 2016 Joel. All rights reserved.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.0.4" },
-                    @{ ModuleName="Configuration";    ModuleVersion="1.2.1" },
+RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.1.0" },
+                    @{ ModuleName="Configuration";    ModuleVersion="1.3.1" },
                     @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
                     @{ ModuleName="PowerLine";        ModuleVersion="3.0.5" },
                     @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" },
