@@ -61,7 +61,11 @@ Import-Module -FullyQualifiedName @{ ModuleName = "Profile";           ModuleVer
 Trace-Message "Modules Imported" -Stopwatch $TraceVerboseTimer
 
 # I prefer that my sessions start in a predictable location, regardless of elevation, etc.
-if($ProfileDir -ne (Get-Location)) { Set-Location $ProfileDir }
+if ($psEditor.Workspace.Path) { # in VS Code, start in the workspace!
+    Set-Location $psEditor.Workspace.Path
+} else {
+    Set-Location $ProfileDir
+}
 
 Trace-Message "Profile Finished!" -KillTimer
 Remove-Variable TraceVerboseTimer
@@ -73,8 +77,8 @@ $VerbosePreference = "SilentlyContinue"
 # SIG # Begin signature block
 # MIIXzgYJKoZIhvcNAQcCoIIXvzCCF7sCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfiRztFay4aA1haOltIg+ADbC
-# gfugghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPIHDiCTk7Dm+8jrv5q2idm61
+# dBSgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -180,23 +184,23 @@ $VerbosePreference = "SilentlyContinue"
 # cnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBTSEEyIEFzc3VyZWQgSUQgQ29kZSBT
 # aWduaW5nIENBAhALDZkX0sdOvwJhwzQTbV+7MAkGBSsOAwIaBQCgeDAYBgorBgEE
 # AYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwG
-# CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBS1TUjz
-# vE8PGqWdO//ziEArQ0OleTANBgkqhkiG9w0BAQEFAASCAQB7l+rIW9tpawXdmknj
-# 01c0VBh0j6wgz0J6PNdcDYeRcHgu9vjOqhCDBluiZtR4pEHCvm7dTgFAgnyeWU33
-# a0y817TrQbpBYwbCAX19bszXegflrxcd69s7r0+IY2oegGs2FMg8bYLPanHAQHxG
-# +2bbRRgrUirdNFbF1dsPNLMlVsmu1703au0/bwPFGq4mnA0WYfr/sJK3ZIMTUJ7N
-# cbbz6q/6nIQQithNgJjrt9S5DoBLewh9NP7FKgL6eoyP0PmIreuT0QLH8i5naMgt
-# o8xGRRlkIFmub6DHeaDki31QJd6xObPiJ378sj93117KY0pY1ILRNneFNh3gvvTy
-# GAHYoYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC
+# CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBRNof1+
+# laoPU5lkEF7uFtdnzisgkTANBgkqhkiG9w0BAQEFAASCAQB1IjfTWH6vzZyH5ylX
+# BIFuVsnf9Dkhe9sN9MX6JOiFo4IB3now77Eult1vuBKMAq/pM0G3KONgkI1JFuUC
+# WIkdOGwzNixUPpbKcD8SMFOzX/6sITIfArLvo+Fo2tTSt9h/N/d6zAkDOGsXDSPz
+# nHw56ZGkfNHDZPlb9/rpKLaBNrX+Co0ow+WiqDfg/A2uqcPRqorff0+3EtFDvE3N
+# iOHsj6DRrebzNJLeREqt/QsmM9t+15yLOsmXL/G6NJTf3Dn6h44N5V3RMFoTM7fD
+# scRTMZT2IoWhV5ayDKHKkx1o0dL9MbvmTP+hrkRsenVYW51yLmd03wXKNDMzNL74
+# 7e81oYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC
 # VVMxHTAbBgNVBAoTFFN5bWFudGVjIENvcnBvcmF0aW9uMTAwLgYDVQQDEydTeW1h
 # bnRlYyBUaW1lIFN0YW1waW5nIFNlcnZpY2VzIENBIC0gRzICEA7P9DjI/r81bgTY
 # apgbGlAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-# KoZIhvcNAQkFMQ8XDTE5MDMxNTAyMTIzMFowIwYJKoZIhvcNAQkEMRYEFLdsXMbf
-# zw6L5HEqBXONX+ddPPffMA0GCSqGSIb3DQEBAQUABIIBAF6Mo5DiBynE9wbCglgs
-# EVdpzLG6cHrnbJFjBCxJMPAMUqcmr4JOkozaQFJC1B20lCI+hzPMt1hqr3A/mIrV
-# 0Dgf6YGMUDyPF3EfCUdSzjS3dzoczKRVDXSPNeIHFXigRnlN0yOnWRX1EhSe3uyV
-# L3Iz4ILdmRtr6J/7YHL7cKbQRfk+q8OgCR7ki+KEvmukBwrVL9TL+wzyuU7dkluk
-# 07IDxezh8KLpReLi6+qQ1GKzn+tQ2o6HsLL/iedW7atzJ07oyrGI5IpThPPHjvKx
-# iPdk4HXsjc9LYmE42KAHhKR22/2ebHW/V/f8IuNBfvc7KQs6983MyH34UYebW7xM
-# c1w=
+# KoZIhvcNAQkFMQ8XDTE5MDMzMDAzMzA1NVowIwYJKoZIhvcNAQkEMRYEFNH1p1RP
+# DFPsTFkAJAZcEKq3aVXBMA0GCSqGSIb3DQEBAQUABIIBADaFE9X4KNzopogM5G5u
+# Mh/0/6xd6A9oRJK8BrKHEv+p7vR2ili8//Mp2drLIPqGI2StpEO4YJzVSUqUfmsQ
+# F+er8oP/zY3xi5FWkLwu5fT3DWQGLyknfbhk3beV13OXhWOmaAWybzaAk2Okl6o+
+# 7iZ2X/cZx/JKl+kar5DufiUQvyzYbrQTJSlWnV1y3oZpKmLQ+PDOigZdR417NAnQ
+# G6Skiddmc8fHlhwHic0vHU5Q/Rr1YRcse/wlHABaFRn26z6sZBzwPlcs4OFeVD01
+# Qe8mT3Sw1Dd2F72N/Kq2MnYHtu7RI5j+g6MLJUYtkYOlY438HR9bsPBmL65X5Ki9
+# VNM=
 # SIG # End signature block

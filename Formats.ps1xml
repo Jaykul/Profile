@@ -345,10 +345,10 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                             <TableColumnItem>
                               <ScriptBlock>
                                 if ($_.CommandType -eq "Alias") {
-                                  if ($this.ResolvedCommand -ne $null) {
-                                    $this.Name + " -> " + $this.ResolvedCommand.Name
+                                  if ($_.ResolvedCommand -ne $null) {
+                                    $_.Name + " -> " + $_.ResolvedCommand.Name
                                   } else {
-                                    $this.Name + " -> " + $this.Definition
+                                    $_.Name + " -> " + $_.Definition
                                   }
                                 } else {
                                   $_.Name
@@ -529,8 +529,8 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
 <!-- SIG # Begin signature block -->
 <!-- MIIXzgYJKoZIhvcNAQcCoIIXvzCCF7sCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB -->
 <!-- gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR -->
-<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUrbhC28BM6HIKg8QC0L8F+z3S -->
-<!-- p7SgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
+<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjXNCkST3RG25qpUMtbfJ15br -->
+<!-- D0agghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
 <!-- AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG -->
 <!-- A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh -->
 <!-- d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg -->
@@ -636,23 +636,23 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
 <!-- cnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBTSEEyIEFzc3VyZWQgSUQgQ29kZSBT -->
 <!-- aWduaW5nIENBAhALDZkX0sdOvwJhwzQTbV+7MAkGBSsOAwIaBQCgeDAYBgorBgEE -->
 <!-- AYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwG -->
-<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQHC5Hh -->
-<!-- yctWb6MK8wc3O8b720YmjjANBgkqhkiG9w0BAQEFAASCAQB7IfXuaGYnkH1pxxtL -->
-<!-- KXpy84p6RKqhStof6TTLcvLjpLCc8/DGJppOqQ1ZzBUzSN28RckSAeccFV7G5efo -->
-<!-- vB1phvbNcnIkc2ZeUXIKZCmwtQzrnhS5VzZcAi75rpZb9+VHyF7c+Nz3Yjd9L8NV -->
-<!-- FLv3cB0xMdR8y2N6rGW+rwCjr2HVK+0IDm5BQlMuazETq/TFtsIax7DFioxZbFnS -->
-<!-- f8bUBxrLWh86ITg0L+NQbuJylTIMwFg5eEllKFXe8jaCi67FHfbeuJggqZIKpc9s -->
-<!-- cWj8qmDHdQ92i3ZJNZa7ZC5yVlkdo6UYH1QCUD6mJAWd0Z6kGOoe/kTKZm7XWJeE -->
-<!-- ra1UoYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
+<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBQ4mLqv -->
+<!-- Iq1yHPnelOQ3HP2NhlbXGTANBgkqhkiG9w0BAQEFAASCAQCOhgohg2wHTN6GB8bI -->
+<!-- OnPjhlK6b94hel45TB/fypqAXgyGqpEEmMkRe0FQBdgoPcjWEVUAj9HXyFHkisbq -->
+<!-- 52cP9eski06Pud8Z69fkMb6PXUbcgxw5Wg8rPEHkOawvmIFjwhbTlHRq2Rwfs9h/ -->
+<!-- o3gaOjg8UYcqqjTzK+u2IRl2bJcmiOIKicdL1Hq2bzsx7Pezu+aKF/3Dj48/ilg+ -->
+<!-- CRmfW+6EVA6VyQ9i8JSvmURFG/6s0igj1wW3gwppnTUMkybwbH/aG9R83Jfh5EKe -->
+<!-- JvgXtrWlGGGuDy2UA07RK9JXdpskG7Favb9AHyKR/dX13cumGuaRaCNbX7C5aSw7 -->
+<!-- Jre0oYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
 <!-- VVMxHTAbBgNVBAoTFFN5bWFudGVjIENvcnBvcmF0aW9uMTAwLgYDVQQDEydTeW1h -->
 <!-- bnRlYyBUaW1lIFN0YW1waW5nIFNlcnZpY2VzIENBIC0gRzICEA7P9DjI/r81bgTY -->
 <!-- apgbGlAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ -->
-<!-- KoZIhvcNAQkFMQ8XDTE5MDMxNTAyMTIyOVowIwYJKoZIhvcNAQkEMRYEFMriyUZc -->
-<!-- uAdhw0TU/Tmk9+BkA35WMA0GCSqGSIb3DQEBAQUABIIBAFDAT5pL/7ZGNJayJ6AD -->
-<!-- IsbFO9qqkmnRMTS6Tl4bwaog7B99nROmcGBCi/79V/y9BDMZ2Yp6l2TrG324SgoT -->
-<!-- APJrrJh6cbXzCVI55gzFfTl8wCimbVq6EfpCGVTynxdzMU8FzvyqgCQ9oFpKj3eV -->
-<!-- 32Fujsxgwd1Y2gBOKf5toHrwru4r7KGNpXSrcssheqXmkSlFyV1XRWqPfO5nLoU9 -->
-<!-- i4S4X42sXBQawPg7ay1p/blmoGDc1T3uBcwBA84iIGIMOPZXKaa6fP4juHJCnofk -->
-<!-- ugOG1Zuomc1d+Fw9qi0TwrZrQ5yrIGFYYI5I61ppV57/CxRz0uho7++hwpf82HsQ -->
-<!-- aw0= -->
+<!-- KoZIhvcNAQkFMQ8XDTE5MDMzMDAzMzA1NFowIwYJKoZIhvcNAQkEMRYEFKGbSeRa -->
+<!-- UfL15Mh2mk0vg2QnZCwQMA0GCSqGSIb3DQEBAQUABIIBAFUylXyRKZ7ZD7hvoTiu -->
+<!-- rUXyRNDp4KJTy4IGPhOYaXdaRnVEEcJ8UcqjjAIgsaYwzX2CEg6U8TsKyHMiJj87 -->
+<!-- oPRThUf+fqQYl+8y6BNxtwBwgXq6fG6g74lyE/4/ctvKRHR8oCHZKqodjaL0bmyi -->
+<!-- gDhRg6vsd1GwUtaoz/IHOfj0y7YHrIF8/kPH1zaWU55tshVMS9I/ny7wa3apdXiu -->
+<!-- g4NiNN9TBfEwag69j4MaMSkxsWIDhnhdSMIF5wJb6gfyUF144liyfUH3GRIvWUjf -->
+<!-- OuKOB4/YsOjIDW+1KOcxKISZjMecjtZ8AxjkG/5i4Pmc1gicCEIM1RJC8ZP3Vt28 -->
+<!-- pOU= -->
 <!-- SIG # End signature block -->

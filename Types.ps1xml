@@ -38,6 +38,19 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
       </Members>
     </Type>
     <Type>
+      <Name>System.Management.Automation.CommandInfo</Name>
+      <Members>
+        <ScriptProperty>
+          <Name>Syntax</Name>
+          <GetScriptBlock>($this | Get-Command -Syntax | Out-String).Trim()</GetScriptBlock>
+        </ScriptProperty>
+        <ScriptProperty>
+          <Name>Synopsis</Name>
+          <GetScriptBlock>($this | Get-Help).Synopsis.Trim()</GetScriptBlock>
+        </ScriptProperty>
+      </Members>
+    </Type>
+    <Type>
         <Name>Microsoft.PowerShell.Commands.MemberDefinition</Name>
         <Members>
             <ScriptProperty>
@@ -104,8 +117,8 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
 <!-- SIG # Begin signature block -->
 <!-- MIIXzgYJKoZIhvcNAQcCoIIXvzCCF7sCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB -->
 <!-- gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR -->
-<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsgARGxGWRXH3JeIfRtuQtuCC -->
-<!-- fpygghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
+<!-- AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvsqwAzX0Uj0kDUgfUtPpcDMu -->
+<!-- ZJqgghMBMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B -->
 <!-- AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG -->
 <!-- A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh -->
 <!-- d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg -->
@@ -211,23 +224,23 @@ This is Joel "Jaykul" Bennett's default types file - it just adds a few helpers
 <!-- cnQuY29tMTEwLwYDVQQDEyhEaWdpQ2VydCBTSEEyIEFzc3VyZWQgSUQgQ29kZSBT -->
 <!-- aWduaW5nIENBAhALDZkX0sdOvwJhwzQTbV+7MAkGBSsOAwIaBQCgeDAYBgorBgEE -->
 <!-- AYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwG -->
-<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBTbD3b7 -->
-<!-- 3sv4raQjDj2Ut6iZLAvrBzANBgkqhkiG9w0BAQEFAASCAQA/DIuNGV7D4imFgEvk -->
-<!-- oUoSbRpYWV8QJcoKFNWbfAUlS9svyiTLNbgJOb7F1vI2BUxNJ39qOhljFjrn07r4 -->
-<!-- 73vDxf5g8BQac0u4SfcEyHQzVjYHq4GSK5v4VTIkIuW0g9dF6KPj8sjkGOfzO+f/ -->
-<!-- wwu9uJ30rUThY1pK3XUfD+UCyMIy5RjriB4UbRLq/+O+ZPlL3nW7OQrlfVH6CbP4 -->
-<!-- KPtEzkbRfXqgXAyX26ieHkZi9KjAFCSaxQgHeRZHJneCecFa0m7VFptR/f1OcWwV -->
-<!-- TyY80ju2EZv1hVrljxLLakv2Usl07ENZJe3LbGk7avZl+q5OvipeZt6qmvcrNMH3 -->
-<!-- lktxoYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
+<!-- CisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqGSIb3DQEJBDEWBBSj/hGN -->
+<!-- ezloefcVhTkSEzA61jRlnDANBgkqhkiG9w0BAQEFAASCAQBM4Y+wZ7/CAlBBDCe1 -->
+<!-- cqrR2I1B4F3kR4gWUs40ltyrHTnK8AgX9yE1qYBOG2QfQZ3enNhahLn2GhXCuHFo -->
+<!-- K40RtjLYa7ZPSTLo3jJdHuvAYIU21dGMDhEyp+ZCYaL46yOY9df3qns+FvhCYDsu -->
+<!-- VhF+WKmM8tP4K0ls37KK4mR7T54fuyc0w1mP/tIiPG0BXf88f0P+5aVpVbUxC+or -->
+<!-- PCo9dEyimhkcO0EETuZDIInLurjtTZ0avzVIDwDzbMLPDzYY8FjXpUJIXpR346fU -->
+<!-- 8crBIMyKdvs/e8idpTEhvihPD45iN3AG693kZBEf5qzSFe5K1Iugk0+oX1Z6/F6u -->
+<!-- b8floYICCzCCAgcGCSqGSIb3DQEJBjGCAfgwggH0AgEBMHIwXjELMAkGA1UEBhMC -->
 <!-- VVMxHTAbBgNVBAoTFFN5bWFudGVjIENvcnBvcmF0aW9uMTAwLgYDVQQDEydTeW1h -->
 <!-- bnRlYyBUaW1lIFN0YW1waW5nIFNlcnZpY2VzIENBIC0gRzICEA7P9DjI/r81bgTY -->
 <!-- apgbGlAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ -->
-<!-- KoZIhvcNAQkFMQ8XDTE5MDMxNTAyMTIzMFowIwYJKoZIhvcNAQkEMRYEFHIfCICw -->
-<!-- ozLvbK1u8r0qx4vTpq4lMA0GCSqGSIb3DQEBAQUABIIBAFow6A5dYMaOOJlH8Wpi -->
-<!-- 5JCEQlKalV3pp6k/nY6w6r82nVykH9oEhP7sDuT3/2FR/q5fumVa8mwpnLBLXcRE -->
-<!-- aJFFWCUImSpuJ2J3q2aPhSAca0ci5ZN25ecgSmGk77ZvayNcLKWyfu/pD4omrqRr -->
-<!-- cfFXOHqQKNCKeW4xCXT2WDlHBNdKAAEMRCwTVi/h6w7SscbhN+cWhAGhWiucIUgk -->
-<!-- w4SFq6ib/acZ7TR13UBqUSO2LPDm4nozBUbF9myp/QIMotuBmoAzGqMoKWgyXMPK -->
-<!-- oyj6a5RsH5hEdvSfnRoQqD+c21vfnJaYDwquAKKJQ7ozBoo+dCWsQfqMnmH0AMMh -->
-<!-- xEA= -->
+<!-- KoZIhvcNAQkFMQ8XDTE5MDMzMDAzMzA1NlowIwYJKoZIhvcNAQkEMRYEFBu+Ejbr -->
+<!-- H+Xbermvzj+As2PERE10MA0GCSqGSIb3DQEBAQUABIIBAAFyuL0rLoBRbrAh/4AA -->
+<!-- WtK2w6UN/2UaNNOnvTRVxIvjjL2po61t6giZjtQh6Ts2hdfyIDA57I2TYApoai9q -->
+<!-- Vy7zyrIlsyf855gDMUEBBnBCXMnMFhixxVpPcxqKD98thYOjLcWP330E6UuYNm1Y -->
+<!-- monnMIG1K5IW1HjQcryBjyLGWK2ib95mDBl0DeIWal1m5el8yHJj5Fo4nDW9rKUU -->
+<!-- ftRm9980s7wflhbTZQUnDA8dtZuqGKohCVvAhDmBAqNgwCA79Kvjf9eh5rHcVNWq -->
+<!-- pJ8Pj5t3fnY2IcFgQnA40P6F0IViJHXn8/GB7bsQm2x3c/nCwrpufvmxoDqWuIXB -->
+<!-- BeQ= -->
 <!-- SIG # End signature block -->
