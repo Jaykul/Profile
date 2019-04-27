@@ -31,13 +31,15 @@
         ".json"   = FileFormat "[38;2;30;144;255m" 
         ".ps1xml" = FileFormat "[38;2;30;144;255m" 謹
         ".psd1"   = FileFormat "[38;2;30;144;255m" 
-        ".yml"    = FileFormat "[38;2;30;144;255m" 
         ".xml"    = FileFormat "[38;2;30;144;255m" 謹
 
         # Config files
         ".conf"   = FileFormat "[38;2;64;224;208m" 煉
         ".config" = FileFormat "[38;2;64;224;208m" 煉
         ".reg"    = FileFormat "[38;2;64;224;208m" 煉
+        ".toml"   = FileFormat "[38;2;0;191;255m" 
+        ".yaml"   = FileFormat "[38;2;30;144;255m" 
+        ".yml"    = FileFormat "[38;2;30;144;255m" 
         ".vscode" = FileFormat "[38;2;64;224;208m" 
 
         # Source Files
