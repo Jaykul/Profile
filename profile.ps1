@@ -3,7 +3,6 @@
 $TraceVerboseTimer = New-Object System.Diagnostics.Stopwatch
 $TraceVerboseTimer.Start()
 ${;} = [System.IO.Path]::PathSeparator
-
 # The job of the profile script is to:
 # 1. Fix the PSModulePath and then
 # 2. Import the Profile module (which this script is part of, technically)
@@ -35,7 +34,7 @@ $Env:PSModulePath = @(
 Import-Module -FullyQualifiedName @{ ModuleName="Environment";      ModuleVersion="1.1.0" },
                                   @{ ModuleName="Configuration";    ModuleVersion="1.3.1" },
                                   @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
-                                  @{ ModuleName="PowerLine";        ModuleVersion="3.0.5" },
+                                  @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" },
                                   @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" },
                                   @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" } # -Verbose:$false
 
@@ -54,7 +53,7 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
     }
 }
 
-Import-Module -FullyQualifiedName @{ ModuleName = "Profile";           ModuleVersion = "1.2.2" } -Verbose:$false
+Import-Module -FullyQualifiedName @{ ModuleName = "Profile";           ModuleVersion = "1.3.0" } -Verbose:$false
 
 # First call to Trace-Message, pass in our TraceTimer that I created at the top to make sure we time EVERYTHING.
 # This has to happen after the verbose check, obviously

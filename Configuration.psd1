@@ -1,6 +1,8 @@
 @{
     FileColors = @{
-        "directory"  = FileFormat "[38;2;255;255;255m" 
+        # Be careful not to use "white" or "black" since those are my normal background colors for work and presentation/admin
+        # Directories can just stay the default foreground color
+        "directory"  = FileFormat "[39m" 
 
         # Archive files are some shade of green
         ".7z"     = FileFormat "[38;2;179;230;204m" 

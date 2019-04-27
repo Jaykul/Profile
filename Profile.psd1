@@ -12,7 +12,7 @@
 RootModule = 'Profile.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.3.0'
+ModuleVersion = '1.4.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -54,7 +54,7 @@ Copyright = '(c) 2016-2019 Joel Bennett. All rights reserved.'
 RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.1.0" },
                     @{ ModuleName="Configuration";    ModuleVersion="1.3.1" },
                     @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
-                    @{ ModuleName="PowerLine";        ModuleVersion="3.0.5" },
+                    @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" },
                     @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" },
                     @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" })
 
