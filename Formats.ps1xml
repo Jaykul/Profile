@@ -421,7 +421,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
         </CustomEntries>
       </CustomControl>
     </View>
-    <View>
+    <!-- <View>
       <Name>ColorScheme</Name>
       <ViewSelectedBy>
         <TypeName>ColorTool.ColorScheme</TypeName>
@@ -504,7 +504,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
           </CustomEntry>
         </CustomEntries>
       </CustomControl>
-    </View>
+    </View> -->
   </ViewDefinitions>
 </Configuration>
 
