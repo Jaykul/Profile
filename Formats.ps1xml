@@ -80,7 +80,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                     }
                     return "{0:##}m {1:n3}s" -f $ts.Minutes, ($ts.TotalSeconds - ($ts.Minutes * 60))
                   }
-                  return "{0:n7}s" -f $ts.TotalSeconds
+                  return "{0:n5}s" -f $ts.TotalSeconds
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>

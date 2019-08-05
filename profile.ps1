@@ -13,14 +13,18 @@ Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope
 $Env:PSModulePath = @(
     # Prioritize "this" location (probably CloudDrive, but possibly my Projects folder)
     @(Split-Path $PSScriptRoot) +
-    # The normal FIRST module location is where the profile lives
+    # The normal FIRST module location is where the "real" profile lives
     @(Join-Path $ProfileDir Modules | Convert-Path) +
     @($Env:PSModulePath -split ${;}) +
     # Ever an optimist, I'll include the _other_ PowerShell\Modules path too
     @(Split-Path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
-    # Guarantee that PSHome\Modules is there so we can load the default modules
+    # The "right" one of these is already in the Env:PSModulePath, but just in case
+    @(Join-Path $PSHome Modules | Convert-Path) +
+    # Here we guaranteeing that all the PSHome\Modules are there
+    @(Split-Path $PSHome | Split-Path | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
+    @(Split-Path $PSHome | Join-Path -ChildPath *\Modules | Convert-Path) +
     # Guarantee my ~\Projects\Modules are there so I can load my dev projects
-    @("$PSHome\Modules", "$Home\Projects\Modules") | Select-Object -Unique
+    @("$Home\Projects\Modules") | Select-Object -Unique
 ) -join ${;}
 
 # Azure CloudShell pwsh freaks out if you try to load these explicitly.

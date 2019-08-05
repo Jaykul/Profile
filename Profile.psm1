@@ -175,12 +175,12 @@ if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
     Get-Quote | Write-Host -Foreground "xt214"
 }
 
-# If you log in with a Windows Identity, this will capture it
+# If you log in with a Microsoft Identity, this will capture it
 Set-Variable LiveID (
-        [System.Security.Principal.WindowsIdentity]::GetCurrent().Groups |
-        Where Value -match "^S-1-11-96" |
-        ForEach Translate([System.Security.Principal.NTAccount]) |
-        ForEach Value) -Option ReadOnly -ErrorAction SilentlyContinue
+    [Security.Principal.WindowsIdentity]::GetCurrent().Groups.Where{
+        $_.Value -match "^S-1-11-96"
+    }.Translate([Security.Principal.NTAccount]).Value
+) -Option ReadOnly -ErrorAction SilentlyContinue
 
 function Update-PSReadLine {
     Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
@@ -189,7 +189,6 @@ function Update-PSReadLine {
 
     Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
     Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
-    Set-PSReadLineKeyHandler Ctrl+Enter AcceptAndGetNext
     Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
 
     Set-PSReadlineKeyHandler Ctrl+M SetMark
@@ -197,6 +196,10 @@ function Update-PSReadLine {
 
     Set-PSReadlineKeyHandler Ctrl+K KillLine
     Set-PSReadlineKeyHandler Ctrl+I Yank
+
+    Set-PSReadLineKeyHandler Ctrl+h BackwardDeleteWord
+    Set-PSReadLineKeyHandler Ctrl+Enter AddLine
+    Set-PSReadLineKeyHandler Ctrl+Shift+Enter AcceptAndGetNext
     Trace-Message "PSReadLine hotkeys fixed"
 
     ## There were some problems with hosts using PSReadLine who shouldn't
