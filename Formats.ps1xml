@@ -40,7 +40,7 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
   </Controls>
   <ViewDefinitions>
     <View>
-      <Name>history</Name>
+      <Name>History</Name>
       <ViewSelectedBy>
         <TypeName>Microsoft.PowerShell.Commands.HistoryInfo</TypeName>
       </ViewSelectedBy>
@@ -87,6 +87,85 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
                 <ScriptBlock>
                   $_.CommandLine.TrimStart() -replace "[\r\n]+", "$([char]0x2026) "
                 </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Service</Name>
+      <ViewSelectedBy>
+        <TypeName>System.ServiceProcess.ServiceController</TypeName>
+        <!-- <TypeName>System.Service.ServiceController#StartupType</TypeName> -->
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Width>7</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>14</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>20</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>StartType</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Service6</Name>
+      <ViewSelectedBy>
+        <TypeName>System.Service.ServiceController#StartupType</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Width>7</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>17</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Width>20</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>StartupType</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
