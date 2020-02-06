@@ -31,6 +31,15 @@ if ($Configuration.FileColors) {
     $global:PSFileFormats = $Configuration.FileColors
 }
 
+if (Get-Command conda) {
+    function Import-Conda {
+        [CmdletBinding()]
+        param ()
+        Add-PowerLineBlock { $Env:CONDA_PROMPT_MODIFIER } -Index ($Prompt.Count - 1)
+        conda "shell.powershell" "hook" | Out-String | Invoke-Expression
+    }
+}
+
 function Set-HostColor {
     <#
         .Description
