@@ -188,20 +188,20 @@ if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
 Set-Variable LiveID (
     [Security.Principal.WindowsIdentity]::GetCurrent().Groups.Where{
         $_.Value -match "^S-1-11-96"
-    }.Translate([Security.Principal.NTAccount]).Value
+    }.ForEach{$_.Translate([Security.Principal.NTAccount])}.Value
 ) -Option ReadOnly -ErrorAction SilentlyContinue
 
 function Update-PSReadLine {
-    Set-PSReadlineKeyHandler Ctrl+Shift+C CaptureScreen
-    Set-PSReadlineKeyHandler Ctrl+Shift+R ForwardSearchHistory
-    Set-PSReadlineKeyHandler Ctrl+R ReverseSearchHistory
+    Set-PSReadlineKeyHandler Ctrl+Alt+c CaptureScreen
+    Set-PSReadlineKeyHandler Ctrl+Shift+r ForwardSearchHistory
+    Set-PSReadlineKeyHandler Ctrl+r ReverseSearchHistory
 
     Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
     Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
     Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
 
-    Set-PSReadlineKeyHandler Ctrl+M SetMark
-    Set-PSReadlineKeyHandler Ctrl+Shift+M ExchangePointAndMark
+    Set-PSReadlineKeyHandler Ctrl+m SetMark
+    Set-PSReadlineKeyHandler Ctrl+Shift+m ExchangePointAndMark
 
     Set-PSReadlineKeyHandler Ctrl+K KillLine
     Set-PSReadlineKeyHandler Ctrl+I Yank

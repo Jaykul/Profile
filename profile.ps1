@@ -2,29 +2,42 @@
 # This timer is used by Trace-Message, I want to start it immediately
 $TraceVerboseTimer = New-Object System.Diagnostics.Stopwatch
 $TraceVerboseTimer.Start()
-${;} = [System.IO.Path]::PathSeparator
+
 # The job of the profile script is to:
 # 1. Fix the PSModulePath and then
 # 2. Import the Profile module (which this script is part of, technically)
-
-## Set the profile directory first, so we can refer to it from now on.
+${;} = [System.IO.Path]::PathSeparator
+# Set the profile directory first, so we can refer to it from now on.
 Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 
+# NOTES:
+# 1. The main concern is to keep things in order
+#    a. "Documents" before "ProgramFiles"
+#    b. "Current Version" before "Other Versions"
+# 2. I don't worry about duplicates because I clear them out at the bottom
+# 3. I refuse to consider x86 because I never use it.
 $Env:PSModulePath = @(
-    # Prioritize "this" location (probably CloudDrive, but possibly my Projects folder)
-    @(Split-Path $PSScriptRoot) +
-    # The normal FIRST module location is where the "real" profile lives
-    @(Join-Path $ProfileDir Modules | Convert-Path) +
+    # Prioritize "this" location (probably CloudDrive) unless it's ~\projects\modules
+    @(if (($ModuleRootParent = Split-Path $PSScriptRoot) -ne "$Home\Projects\Modules") { $ModuleRootParent }) +
+    # The normal first location in PSModulePath is the "Modules" folder next to the real profile:
+    @(Join-Path $ProfileDir Modules) +
+    # After that, whatever is in the environment variable
     @($Env:PSModulePath -split ${;}) +
-    # Ever an optimist, I'll include the _other_ PowerShell\Modules path too
-    @(Split-Path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
-    # The "right" one of these is already in the Env:PSModulePath, but just in case
-    @(Join-Path $PSHome Modules | Convert-Path) +
+    # As an optimist, also include the _other_ Documents paths too (i.e. Documents\PowerShell\Modules in PS5 and Documents\WindowsPowerShell\Modules in PS6)
+    @(Split-Path $ProfileDir | Join-Path -ChildPath *PowerShell\Modules ) +
+    # PSHome is where powershell.exe or pwsh.exe lives ... it should already be in the Env:PSModulePath, but just in case:
+    @(Join-Path $PSHome Modules ) +
+    # Then we want to make sure that all variations of ProgramFiles\PowerShell\Modules, ProgramFiles\PowerShell\#\Modules and Windows\System32\WindowsPowerShell\Modules
     # Here we guaranteeing that all the PSHome\Modules are there
-    @(Split-Path $PSHome | Split-Path | Join-Path -ChildPath *PowerShell\Modules | Convert-Path) +
-    @(Split-Path $PSHome | Join-Path -ChildPath *\Modules | Convert-Path) +
+    @(
+        Join-Path $Env:ProgramFiles *PowerShell\Modules
+        Join-Path $Env:ProgramFiles *PowerShell\*\Modules
+        Join-Path $Env:SystemRoot System32\*PowerShell\*\Modules
+    ) +
     # Guarantee my ~\Projects\Modules are there so I can load my dev projects
-    @("$Home\Projects\Modules") | Select-Object -Unique
+    @("$Home\Projects\Modules") +
+    # To ensure canonical path case, wildcard every path separator and then convert-path
+    @() -replace '(?<!:|\\|/|\*)(\\|/|$)', '*$1' | Convert-Path -ErrorAction SilentlyContinue | Select-Object -Unique
 ) -join ${;}
 
 # Azure CloudShell pwsh freaks out if you try to load these explicitly.
@@ -40,7 +53,8 @@ Import-Module -FullyQualifiedName @{ ModuleName="Environment";      ModuleVersio
                                   @{ ModuleName="Pansies";          ModuleVersion="2.0.0" },
                                   @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" },
                                   @{ ModuleName="PSReadLine";       ModuleVersion="2.1.0" },
-                                  @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" } # -Verbose:$false
+                                  @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" },
+                                  @{ ModuleName="ErrorView";        ModuleVersion="0.0.2" } -Verbose:$false
 
 # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
 if ("Desktop" -eq $PSVersionTable.PSEdition) {
