@@ -51,11 +51,11 @@ Copyright = '(c) 2016-2019 Joel Bennett. All rights reserved.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.1.0" },
-                    @{ ModuleName="Configuration";    ModuleVersion="1.3.1" },
-                    @{ ModuleName="Pansies";          ModuleVersion="1.4.0" },
-                    @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" },
-                    @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" },
+RequiredModules = @(@{ ModuleName="Environment";      ModuleVersion="1.1.0" }
+                    @{ ModuleName="Configuration";    ModuleVersion="1.4.0" }
+                    @{ ModuleName="Pansies";          ModuleVersion="2.0.0" }
+                    @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" }
+                    @{ ModuleName="PSReadLine";       ModuleVersion="2.1.0" }
                     @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" })
 
 # Assemblies that must be loaded prior to importing this module
