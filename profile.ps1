@@ -1,4 +1,4 @@
-﻿trap { Write-Warning ($_.ScriptStackTrace | Out-String) }
+trap { Write-Warning ($_.ScriptStackTrace | Out-String) }
 # This timer is used by Trace-Message, I want to start it immediately
 $TraceVerboseTimer = New-Object System.Diagnostics.Stopwatch
 $TraceVerboseTimer.Start()
@@ -65,7 +65,7 @@ Trace-Message "Modules Imported" -Stopwatch $TraceVerboseTimer
 
 # I prefer that my sessions start in a predictable location, regardless of elevation, etc.
 if ($psEditor.Workspace.Path) { # in VS Code, start in the workspace!
-    Set-Location $psEditor.Workspace.Path
+    Set-Location ([Uri]$psEditor.Workspace.Path).AbsolutePath
 } else {
     Set-Location $ProfileDir
 }
