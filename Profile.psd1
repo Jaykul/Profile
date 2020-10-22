@@ -52,14 +52,15 @@ Copyright = '(c) 2016-2019 Joel Bennett. All rights reserved.'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-    @{ ModuleName="Environment";      ModuleVersion="1.1.0" }
-    @{ ModuleName="Configuration";    ModuleVersion="1.4.0" }
-    @{ ModuleName="Pansies";          ModuleVersion="2.0.0" }
-    @{ ModuleName="PowerLine";        ModuleVersion="3.1.1" }
-    @{ ModuleName="PSReadLine";       ModuleVersion="2.1.0" }
-    @{ ModuleName="DefaultParameter"; ModuleVersion="1.7.0" }
-    @{ ModuleName="ErrorView";        ModuleVersion="0.0.2" }
-    )
+    @{ ModuleName="Environment";      RequiredVersion="1.1.0" }
+    @{ ModuleName="Configuration";    RequiredVersion="1.4.0" }
+    @{ ModuleName="Pansies";          RequiredVersion="2.1.0" }
+    @{ ModuleName="PowerLine";        RequiredVersion="3.2.2" }
+    @{ ModuleName="PSReadLine";       RequiredVersion="2.1.0" }
+    @{ ModuleName="DefaultParameter"; RequiredVersion="2.0.0" }
+    @{ ModuleName="ErrorView";        RequiredVersion="0.0.2" }
+    @{ ModuleName="EzTheme";          RequiredVersion="0.1.0" }
+)
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
