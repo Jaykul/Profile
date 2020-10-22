@@ -40,18 +40,6 @@ if (Get-Command cond[a]) {
     }
 }
 
-if ($Env:WT_SESSION) {
-    Import-Module -FullyQualifiedName @{ ModuleName = "Theme.Terminal"; RequiredVersion = "0.1.0" } -Verbose:$false
-}
-
-if (Test-Elevation) {
-    Import-Theme Lightly
-} elseif($PSVersionTable.PSVersion.Major -le 5) {
-    Import-Theme Legacy
-} else {
-    Import-Theme Darkly
-}
-
 filter Measure-Script {
     <#
         .SYNOPSIS
@@ -120,7 +108,7 @@ function Update-PSReadLine {
             ShowToolTips                  = $true
             WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
         }
-        $if ("PoshCode.Pansies.Entities" -as [Type]) {
+        if ("PoshCode.Pansies.Entities" -as [Type]) {
             $PSReadLineOption.PromptText = [PoshCode.Pansies.Entities]::ExtendedCharacters.ColorSeparator
         }
     }
