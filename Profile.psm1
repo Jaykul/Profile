@@ -40,49 +40,64 @@ if (Get-Command conda) {
     }
 }
 
+if ($Env:WT_SESSION) {
+    Import-Module -FullyQualifiedName @{ ModuleName = "Theme.Terminal"; RequiredVersion = "0.1.0" } -Verbose:$false
+}
+
+if (Test-Elevation) {
+    Import-Theme Lightly
+} elseif($PSVersionTable.PSVersion.Major -le 5) {
+    Import-Theme Legacy
+} else {
+    Import-Theme Darkly
+}
+
+function Update-PSReadLine {
+    # Only configure PSReadLine if it's already running
+    if (Get-Module PSReadline) {
+        Set-PSReadlineKeyHandler Ctrl+Alt+c CaptureScreen
+        Set-PSReadlineKeyHandler Ctrl+Shift+r ForwardSearchHistory
+        Set-PSReadlineKeyHandler Ctrl+r ReverseSearchHistory
+
+        Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
+        Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
+        Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
+
+        Set-PSReadlineKeyHandler Ctrl+m SetMark
+        Set-PSReadlineKeyHandler Ctrl+Shift+m ExchangePointAndMark
+
+        Set-PSReadlineKeyHandler Ctrl+K KillLine
+        Set-PSReadlineKeyHandler Ctrl+I Yank
+
+        Set-PSReadLineKeyHandler Ctrl+h BackwardDeleteWord
+        Set-PSReadLineKeyHandler Ctrl+Enter AddLine
+        Set-PSReadLineKeyHandler Ctrl+Shift+Enter AcceptAndGetNext
+        Trace-Message "PSReadLine hotkeys fixed"
+
+        $PSReadLineOption = @{
+            AnsiEscapeTimeout             = 100
+            BellStyle                     = "Audible"
+            CompletionQueryItems          = 100
+            ContinuationPrompt            = ">> "
+            DingDuration                  = 50 #ms
+            DingTone                      = 1221
+            EditMode                      = "Windows"
+            PromptText                    = "> "
+            HistoryNoDuplicates           = $false
+            HistorySaveStyle              = "SaveIncrementally"
+            HistorySearchCaseSensitive    = $false
+            HistorySearchCursorMovesToEnd = $false
+            MaximumHistoryCount           = 1024
+            MaximumKillRingCount          = 10
+            ShowToolTips                  = $true
+            WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
+        }
+        $if ("PoshCode.Pansies.Entities" -as [Type]) {
+            $PSReadLineOption.PromptText = [PoshCode.Pansies.Entities]::ExtendedCharacters.ColorSeparator
+        }
+    }
+}
 function Set-HostColor {
-    <#
-        .Description
-            Set more reasonable colors, because yellow is for warning, not verbose
-    #>
-    [CmdletBinding()]
-    param(
-        # Change the background color only if ConEmu didn't already do that.
-        [Switch]$Light=$(Test-Elevation),
-
-        # Don't use the special PowerLine characters
-        [Switch]$SafeCharacters,
-
-        # If set, run the script even when it's not the ConsoleHost
-        [switch]$Force
-    )
-
-    ## In the PowerShell Console, we can only use console colors, so we have to pick them by name.
-    if ($Light) {
-        Import-Theme Light
-    } else {
-        Import-Theme Dark
-    }
-
-    $PSReadLineOption = @{
-        AnsiEscapeTimeout             = 100
-        BellStyle                     = "Audible"
-        CompletionQueryItems          = 100
-        ContinuationPrompt            = ">> "
-        DingDuration                  = 50 #ms
-        DingTone                      = 1221
-        EditMode                      = "Windows"
-        HistoryNoDuplicates           = $false
-        HistorySaveStyle              = "SaveIncrementally"
-        HistorySearchCaseSensitive    = $false
-        HistorySearchCursorMovesToEnd = $false
-        MaximumHistoryCount           = 1024
-        MaximumKillRingCount          = 10
-        ShowToolTips                  = $true
-        WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
-    }
-    Set-PSReadlineOption @PSReadLineOption
-
     if(Get-Module PSGit -ErrorAction SilentlyContinue) {
         Set-GitPromptSettings -SeparatorText '' -BeforeText '' -BeforeChangesText '' -AfterChangesText '' -AfterNoChangesText '' `
                               -BranchText  "§ " -BranchForeground 'xt229'   -BranchBackground   $null `
@@ -92,8 +107,6 @@ function Set-HostColor {
                               -UnStagedChangesForeground Black -UnStagedChangesBackground $null
     }
 }
-# Set the colors as early as we can (before any output)
-Set-HostColor
 
 function Update-ToolPath {
     #.Synopsis
@@ -145,85 +158,51 @@ function Reset-Module {
     Microsoft.PowerShell.Core\Import-Module $ModuleName -Force -Pass -Scope Global | Format-Table Name, Version, Path -Auto
 }
 
-if(!$ProfileDir -or !(Test-Path $ProfileDir)) {
-    $ProfileDir = Split-Path $Profile.CurrentUserAllHosts
+function Get-Quote {
+    [CmdletBinding()][Alias("gq")]
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string]$Path = "${QuoteDir}\attributed quotes.txt",
+        [int]$Count = 1
+    )
+    if (!(Test-Path $Path) ) {
+        $Path = Join-Path ${QuoteDir} $Path
+        if (!(Test-Path $Path) ) {
+            $Path = $Path + ".txt"
+        }
+    }
+    (Get-Content $Path) -ne '' | Get-Random -Count $Count
 }
-Write-Warning "ProfileDir $ProfileDir"
 
 $QuoteDir = Join-Path (Split-Path $ProfileDir -parent) "Quotes"
-if(!(Test-Path $QuoteDir)) {
+if (!(Test-Path $QuoteDir)) {
     $QuoteDir = Join-Path $PSScriptRoot Quotes
 }
 
 # Only export $QuoteDir if it refers to a folder that actually exists
 Set-Variable QuoteDir (Resolve-Path $QuoteDir) -Description "Personal Quotes Path Source"
 
-function Get-Quote {
-    [CmdletBinding()][Alias("gq")]
-    param(
-        [Parameter(ValueFromRemainingArguments=$true)]
-        [string]$Path = "${QuoteDir}\attributed quotes.txt",
-        [int]$Count=1
-    )
-    if(!(Test-Path $Path) ) {
-        $Path = Join-Path ${QuoteDir} $Path
-        if(!(Test-Path $Path) ) {
-            $Path = $Path + ".txt"
-        }
-    }
-    Get-Content $Path | Where { $_ } | Get-Random -Count $Count
+if(!$ProfileDir -or !(Test-Path $ProfileDir)) {
+    Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 }
 
-# Run these functions once
-Update-ToolPath
-
-Trace-Message "Random Quotes Loaded"
-
-## Get a random quote, and print it in yellow :D
-if( Test-Path "${QuoteDir}\attributed quotes.txt" ) {
-    Get-Quote | Write-Host -Foreground "xt214"
-}
 
 # If you log in with a Microsoft Identity, this will capture it
-Set-Variable LiveID (
-    [Security.Principal.WindowsIdentity]::GetCurrent().Groups.Where{
-        $_.Value -match "^S-1-11-96"
-    }.ForEach{$_.Translate([Security.Principal.NTAccount])}.Value
-) -Option ReadOnly -ErrorAction SilentlyContinue
+# Set-Variable LiveID (
+#     [Security.Principal.WindowsIdentity]::GetCurrent().Groups.Where{
+#         $_.Value -match "^S-1-11-96"
+#     }.ForEach{$_.Translate([Security.Principal.NTAccount])}.Value
+# ) -Option ReadOnly -ErrorAction SilentlyContinue
 
-function Update-PSReadLine {
-    Set-PSReadlineKeyHandler Ctrl+Alt+c CaptureScreen
-    Set-PSReadlineKeyHandler Ctrl+Shift+r ForwardSearchHistory
-    Set-PSReadlineKeyHandler Ctrl+r ReverseSearchHistory
 
-    Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
-    Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
-    Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
-
-    Set-PSReadlineKeyHandler Ctrl+m SetMark
-    Set-PSReadlineKeyHandler Ctrl+Shift+m ExchangePointAndMark
-
-    Set-PSReadlineKeyHandler Ctrl+K KillLine
-    Set-PSReadlineKeyHandler Ctrl+I Yank
-
-    Set-PSReadLineKeyHandler Ctrl+h BackwardDeleteWord
-    Set-PSReadLineKeyHandler Ctrl+Enter AddLine
-    Set-PSReadLineKeyHandler Ctrl+Shift+Enter AcceptAndGetNext
-    Trace-Message "PSReadLine hotkeys fixed"
-
-    ## There were some problems with hosts using PSReadLine who shouldn't
-    if ($Host.Name -ne "ConsoleHost") {
-        Remove-Module PSReadLine -ErrorAction SilentlyContinue
-        Trace-Message "PSReadLine unloaded!"
-    }
+# Run these functions once
+if (Test-Path "${QuoteDir}\attributed quotes.txt") {
+    ## Get a random quote, and print it in yellow :D
+    Get-Quote | Write-Host -Foreground "xt214"
 }
-
-# Only configure PSReadLine if it's already running
-if (Get-Module PSReadline) {
-    Update-PSReadLine
-}
-
-# Unfortunately, in order for our File Format colors and History timing to take prescedence, we need to PREPEND the path:
+Update-ToolPath
+Update-PSReadLine
+# In order for our File Format colors and History timing to take prescedence over the built-in ones, PREPEND the path:
 Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'Formats.ps1xml')
 
-Export-ModuleMember -Function * -Alias * -Variable LiveID, QuoteDir
+Export-ModuleMember -Function * -Alias * -Variable QuoteDir
