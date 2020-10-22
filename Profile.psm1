@@ -1,4 +1,4 @@
-class FileFormat {
+﻿class FileFormat {
     [string]$Color
     [char]$Icon
 
@@ -31,7 +31,7 @@ if ($Configuration.FileColors) {
     $global:PSFileFormats = $Configuration.FileColors
 }
 
-if (Get-Command conda) {
+if (Get-Command cond[a]) {
     function Import-Conda {
         [CmdletBinding()]
         param ()
