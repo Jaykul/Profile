@@ -52,6 +52,34 @@ if (Test-Elevation) {
     Import-Theme Darkly
 }
 
+filter Measure-Script {
+    <#
+        .SYNOPSIS
+            A wrapper for Measure-Command to run commands multiple times and report averages (avg, min, max)
+    #>
+    param(
+        # The script to measure
+        [Parameter(ValueFromPipeline)]
+        [ScriptBlock]$Expression,
+
+        # Number of iterations to run
+        [int]$Count = 100
+    )
+    @(1..$Count).ForEach{ Measure-Command $Expression } |
+    Measure-Object TotalMilliseconds -Average -Minimum -Maximum |
+    ForEach-Object {
+        [PSCustomObject]@{
+            PSTypeName = "ScriptRunTimings"
+            "Avg(ms)"  = $_.Average
+            "Max(ms)"  = $_.Maximum
+            "Min(ms)"  = $_.Minimum
+            Expression = $Expression
+            Count      = $_.Count
+        }
+    }
+}
+Update-TypeData -TypeName ScriptRunTimings -DefaultDisplayPropertySet "Avg(ms)", "Max(ms)", "Min(ms)", Expression
+
 function Update-PSReadLine {
     # Only configure PSReadLine if it's already running
     if (Get-Module PSReadline) {
