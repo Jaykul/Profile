@@ -90,27 +90,27 @@ function Update-PSReadLine {
         Set-PSReadLineKeyHandler Ctrl+Shift+Enter AcceptAndGetNext
         Trace-Message "PSReadLine hotkeys fixed"
 
-        $PSReadLineOption = @{
-            AnsiEscapeTimeout             = 100
-            BellStyle                     = "Audible"
-            CompletionQueryItems          = 100
-            ContinuationPrompt            = ">> "
-            DingDuration                  = 50 #ms
-            DingTone                      = 1221
-            EditMode                      = "Windows"
-            PromptText                    = "> "
-            HistoryNoDuplicates           = $false
-            HistorySaveStyle              = "SaveIncrementally"
-            HistorySearchCaseSensitive    = $false
-            HistorySearchCursorMovesToEnd = $false
-            MaximumHistoryCount           = 1024
-            MaximumKillRingCount          = 10
-            ShowToolTips                  = $true
-            WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
-        }
-        if ("PoshCode.Pansies.Entities" -as [Type]) {
-            $PSReadLineOption.PromptText = [PoshCode.Pansies.Entities]::ExtendedCharacters.ColorSeparator
-        }
+        # $PSReadLineOption = @{
+        #     AnsiEscapeTimeout             = 100
+        #     BellStyle                     = "Audible"
+        #     CompletionQueryItems          = 100
+        #     ContinuationPrompt            = ">> "
+        #     DingDuration                  = 50 #ms
+        #     DingTone                      = 1221
+        #     EditMode                      = "Windows"
+        #     PromptText                    = "> "
+        #     HistoryNoDuplicates           = $false
+        #     HistorySaveStyle              = "SaveIncrementally"
+        #     HistorySearchCaseSensitive    = $false
+        #     HistorySearchCursorMovesToEnd = $false
+        #     MaximumHistoryCount           = 1024
+        #     MaximumKillRingCount          = 10
+        #     ShowToolTips                  = $true
+        #     WordDelimiters                = ";:,.[]{}()/\|^&*-=+"
+        # }
+        # if ("PoshCode.Pansies.Entities" -as [Type]) {
+        #     $PSReadLineOption.PromptText = [PoshCode.Pansies.Entities]::ExtendedCharacters.ColorSeparator
+        # }
     }
 }
 function Set-HostColor {
@@ -217,7 +217,7 @@ if (Test-Path "${QuoteDir}\attributed quotes.txt") {
     Get-Quote | Write-Host -Foreground "xt214"
 }
 Update-ToolPath
-Update-PSReadLine
+# Update-PSReadLine
 # In order for our File Format colors and History timing to take prescedence over the built-in ones, PREPEND the path:
 Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'Formats.ps1xml')
 

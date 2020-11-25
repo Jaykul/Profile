@@ -1,11 +1,17 @@
 ﻿trap { Write-Warning ($_.ScriptStackTrace | Out-String) }
-Import-Module -Name Microsoft.PowerShell.Management, Microsoft.PowerShell.Security
-# The job of the profile script is to:
-# 1. Fix the PSModulePath and then
-# 2. Import the Profile module (which this script is part of, technically)
+# # # # # # # # # # # Bleeping Computer # # # # # # # # # # #
+# These get imported no matter what, but we can save a few ms by importing them ourselves
+# Except that Azure CloudShell pwsh used to freak out if you tried to load these explicitly.
+Import-Module -Name Microsoft.PowerShell.Management, Microsoft.PowerShell.Security, Microsoft.PowerShell.Utility -Verbose:$false
+
+# The purpose of this profile script is to:
+# 1. Fix the PSModulePath, which must be different in different versions of PowerShell
+# 2. Initialize settings for modules (PSReadLine) which have defaults I don't like, and no configuration
+# 3. Import the Profile module (which this script is part of, technically)
 # Set the profile directory first, so we can refer to it from now on.
 Set-Variable ProfileDir (Split-Path $Profile.CurrentUserAllHosts -Parent) -Scope Global -Option AllScope, Constant -ErrorAction SilentlyContinue
 
+# PART 1: Fix the PSModulePath
 function Select-UniquePath {
     <#
         .SYNOPSIS
@@ -97,48 +103,58 @@ $Env:PSModulePath =
     # To ensure canonical path case, wildcard every path separator and then convert-path
     @() | Select-UniquePath
 
-# Azure CloudShell pwsh freaks out if you try to load these explicitly.
-# # # # # # # # # # # Bleeping Computer # # # # # # # # # # #
-# # These get loaded automatically anyway, it's just faster to load them explicitly up front
-# Import-Module Microsoft.PowerShell.Management,
-#               Microsoft.PowerShell.Security,
-#               Microsoft.PowerShell.Utility -Verbose:$false
+# PART 2. Fix default values
+# PSReadLine is usually pre-loaded if it can be
+if (Get-Module PSReadline) {
+    Set-PSReadlineKeyHandler Ctrl+Alt+c CaptureScreen
+    Set-PSReadlineKeyHandler Ctrl+Shift+r ForwardSearchHistory
+    Set-PSReadlineKeyHandler Ctrl+r ReverseSearchHistory
 
-# Note these are dependencies of the Profile module, but it's faster to load them explicitly up front
+    Set-PSReadlineKeyHandler Ctrl+DownArrow HistorySearchForward
+    Set-PSReadlineKeyHandler Ctrl+UpArrow HistorySearchBackward
+    Set-PSReadLineKeyHandler Ctrl+Home BeginningOfHistory
 
-$PromptModules = @(
-    @{ ModuleName="Environment";      RequiredVersion="1.1.0" }
-    @{ ModuleName="Configuration";    RequiredVersion="1.4.0" }
-    @{ ModuleName="Pansies";          RequiredVersion="2.1.0" }
-    @{ ModuleName="PowerLine";        RequiredVersion="3.2.2" }
-    # @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" }
-)
-$Customization = @(
-    @{ ModuleName = "DefaultParameter"; RequiredVersion = "2.0.0" }
-    @{ ModuleName = "ErrorView"; RequiredVersion = "0.0.2" }
-    @{ ModuleName = "Profile"; ModuleVersion = "1.3.0" }
-)
+    Set-PSReadlineKeyHandler Ctrl+m SetMark
+    Set-PSReadlineKeyHandler Ctrl+Shift+m ExchangePointAndMark
 
-if ($Env:WT_SESSION) {
-    $ThemeModules = @(
-        "Theme.PowerShell"
-        "Theme.PSReadline"
-        "Theme.Terminal"
-        "EzTheme"
-    )
-} else {
-    $ThemeModules = @(
-        "Theme.PowerShell"
-        "Theme.PSReadline"
-        "EzTheme"
-    )
+    Set-PSReadlineKeyHandler Ctrl+K KillLine
+    Set-PSReadlineKeyHandler Ctrl+I Yank
+
+    Set-PSReadLineKeyHandler Ctrl+h BackwardDeleteWord
+    Set-PSReadLineKeyHandler Ctrl+Enter AddLine
+    Set-PSReadLineKeyHandler Ctrl+Shift+Enter AcceptAndGetNext
 }
 
-$DefaultModules = $PromptModules + $Customization
+# PART 3. Import the Profile module
+#   For now, we're not going to import the profile module because it takes too long
+#   Instead we list the modules that would be imported and define Import-DefaultModule to import them
+
+# Note these are dependencies of the Profile module, but it's faster to load them explicitly up front
+$DefaultModules = @(
+    @{ ModuleName="Environment";        RequiredVersion="1.1.0" }
+    @{ ModuleName="Configuration";      RequiredVersion="1.4.0" }
+    @{ ModuleName="Pansies";            RequiredVersion="2.1.0" }
+    @{ ModuleName="PowerLine";          RequiredVersion="3.2.2" }
+    # @{ ModuleName="PSReadLine";       ModuleVersion="2.0.0" }
+
+    @{ ModuleName = "DefaultParameter"; RequiredVersion = "2.0.0" }
+    @{ ModuleName = "ErrorView";        RequiredVersion = "0.0.2" }
+    @{ ModuleName = "Profile";          ModuleVersion = "1.3.0" }
+
+    if ($Env:WT_SESSION) {
+        @{ ModuleName = "Theme.PowerShell"; ModuleVersion = "0.0" }
+        @{ ModuleName = "Theme.PSReadline"; ModuleVersion = "0.0" }
+        @{ ModuleName = "Theme.Terminal";   ModuleVersion = "0.0" }
+        @{ ModuleName = "EzTheme";          ModuleVersion = "0.0" }
+    } else {
+        @{ ModuleName = "Theme.PowerShell"; ModuleVersion = "0.0" }
+        @{ ModuleName = "Theme.PSReadline"; ModuleVersion = "0.0" }
+        @{ ModuleName = "EzTheme";          ModuleVersion = "0.0" }
+    }
+)
 
 function Import-DefaultModule {
     Import-Module -FullyQualifiedName $DefaultModules
-    Import-Module $ThemeModules
 
     if (Test-Elevation) {
         Import-Theme Lightly -IncludeModule Theme.PowerShell, Theme.PSReadLine, Theme.Terminal, PowerLine
