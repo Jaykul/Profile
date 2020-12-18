@@ -370,15 +370,15 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>
-                                if ($_.CommandType -eq "Alias") {
-                                  if ($_.ResolvedCommand -ne $null) {
-                                    $_.Name + " -> " + $_.ResolvedCommand.Name
-                                  } else {
-                                    $_.Name + " -> " + $_.Definition
-                                  }
-                                } else {
-                                  $_.Name
-                                }
+                  if ($_.CommandType -eq "Alias") {
+                    if ($_.ResolvedCommand -ne $null) {
+                      $_.Name + " -> " + $_.ResolvedCommand.Name
+                    } else {
+                      $_.Name + " -> " + $_.Definition
+                    }
+                  } else {
+                    $_.Name
+                  }
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
@@ -403,61 +403,73 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
             <CustomItem>
               <ExpressionBinding>
                 <ScriptBlock>
-                                    [string]$curDir = $pwd.Path
-                                    if (!$host.UI.SupportsVirtualTerminal)
-                                    {
-                                        $_.ToString($curDir)
-                                        return
-                                    }
+                  [string]$curDir = $pwd.Path
+                  $esc = [char]0x1b
+                  if (!$host.UI.SupportsVirtualTerminal)
+                  {
+                      $_.ToString($curDir)
+                      return
+                  }
 
-                                    function FormatLine($matchInfo, [string]$line, [int]$lineNumber, [string]$displayPath, [string]$prefix, [switch]$isMatchLine)
-                                    {
-                                        if ($isMatchLine)
-                                        {
-                                            $esc = [char]0x1b
-                                            for($i = $matchInfo.Matches.Count -1; $i -ge 0; $i-=1){
-                                                $match = $matchInfo.Matches[$i]
-                                                $Line = $Line.Insert($match.Index + $match.Length, "$esc[0m").Insert($match.Index, (Get-PSReadLineOption).EmphasisColor)
-                                            }
-                                        }
+                  function FormatLine($matchInfo, [string]$line, [int]$lineNumber, [string]$displayPath, [string]$prefix, [switch]$isMatchLine)
+                  {
+                      $colorOptions = Get-PSReadLineOption
+                      $multipleColors = $colorOptions.StringColor, $colorOptions.VariableColor, $colorOptions.KeywordColor
+                      if ($isMatchLine)
+                      {
+                          for ($i = $matchInfo.Matches.Count -1; $i -ge 0; $i-=1){
+                              $match = $matchInfo.Matches[$i]
+                              $Line = $Line.Insert($match.Index + $match.Length, "$esc[0m")
+                              if ($match.Groups.Count -gt 1) {
+                                for ($g = $match.Groups.Count -1; $g -gt 0; $g-=1) {
+                                  $group = $match.Groups[$g]
+                                  $color = $multipleColors[$g%$multipleColors.Length]
+                                  # Adding members here would be too late (you have to output the MatchInfo before they appear)!
+                                  # $matchInfo | Add-Member -NotePropertyname $group.Name -NotePropertyValue $group.Value -ErrorAction SilentlyContinue
+                                  $Line = $Line.Insert($group.Index + $group.Length, "$esc[0m$($colorOptions.EmphasisColor)").Insert($group.Index, $color)
+                                }
+                              }
+                              $Line = $Line.Insert($match.Index, $colorOptions.EmphasisColor)
+                          }
+                      }
 
-                                        if ($matchInfo.Path -ne 'InputStream')
-                                        {
-                                            "{0}{1}{2}$esc[0m:{3}{4}$esc[0m:{5}" -f (Get-PSReadLineOption).DefaultTokenColor, $prefix, $displayPath, (Get-PSReadLineOption).NumberColor, $lineNumber, $line
-                                        }
-                                        else
-                                        {
-                                            "{0}{1}" -f $prefix, $line
-                                        }
-                                    }
+                      if ($matchInfo.Path -ne 'InputStream')
+                      {
+                          "{0}{1}{2}$esc[0m:{3}{4}$esc[0m:{5}" -f $colorOptions.DefaultTokenColor, $prefix, $displayPath, $colorOptions.NumberColor, $lineNumber, $line
+                      }
+                      else
+                      {
+                          "{0}{1}" -f $prefix, $line
+                      }
+                  }
 
-                                    $displayPath = if ('' -eq $curDir) { $_.Path } else { $_.RelativePath($curDir) }
-                                    if ($null -eq $_.Context)
-                                    {
-                                        FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $_.LineNumber -DisplayPath $displayPath -Prefix "" -IsMatchLine
-                                    }
-                                    else
-                                    {
-                                        $lines = . {
-                                        $displayLineNumber = $_.LineNumber - $_.Context.DisplayPreContext.Length;
-                                        foreach ($contextLine in $_.Context.DisplayPreContext)
-                                        {
-                                            FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
-                                            $displayLineNumber += 1
-                                        }
+                  $displayPath = if ('' -eq $curDir) { $_.Path } else { $_.RelativePath($curDir) }
+                  if ($null -eq $_.Context)
+                  {
+                      FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $_.LineNumber -DisplayPath $displayPath -Prefix "" -IsMatchLine
+                  }
+                  else
+                  {
+                      $lines = . {
+                      $displayLineNumber = $_.LineNumber - $_.Context.DisplayPreContext.Length;
+                      foreach ($contextLine in $_.Context.DisplayPreContext)
+                      {
+                          FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
+                          $displayLineNumber += 1
+                      }
 
-                                        FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "> " -IsMatchLine
-                                        $displayLineNumber += 1
+                      FormatLine -MatchInfo $_ -Line $_.Line -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "> " -IsMatchLine
+                      $displayLineNumber += 1
 
-                                        foreach ($contextLine in $_.Context.DisplayPostContext)
-                                        {
-                                            FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
-                                            $displayLineNumber += 1
-                                        }
-                                        }
+                      foreach ($contextLine in $_.Context.DisplayPostContext)
+                      {
+                          FormatLine -MatchInfo $_ -Line $contextLine -LineNumber $displayLineNumber -DisplayPath $displayPath -Prefix "  "
+                          $displayLineNumber += 1
+                      }
+                      }
 
-                                        $lines -join ([Environment]::Newline)
-                                    }
+                      $lines -join ([Environment]::Newline)
+                  }
                 </ScriptBlock>
               </ExpressionBinding>
             </CustomItem>
